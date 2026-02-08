@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+  <h2>Notifications</h2>
+  {% if notifications %}
+    <ul class="list-group">
+      {% for n in notifications %}
+        <li class="list-group-item d-flex justify-content-between align-items-start {% if n.read %}list-group-item-light{% endif %}">
+          <div>
+            <div class="fw-bold">{{ n.level|capfirst }}</div>
+            <div>{{ n.message }}</div>
+            {% if n.link %}
+              <small><a href="{{ n.link }}">View</a></small>
+            {% endif %}
+          </div>
+          <div class="text-end">
+            <div class="text-muted small">{{ n.created_at|date:"M j, Y H:i" }}</div>
+            {% if n.recipient %}
+              <button class="btn btn-sm btn-outline-primary toggle-read-btn mt-2" data-id="{{ n.id }}">{% if n.read %}Mark unread{% else %}Mark read{% endif %}</button>
+            {% endif %}
+          </div>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <div class="alert alert-info">No notifications at this time.</div>
+  {% endif %}
+{% block extra_scripts %}
+<script>
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+document.addEventListener('click', function(e){
+  if(!e.target.matches('.toggle-read-btn')) return;
+  const btn = e.target;
+  const id = btn.dataset.id;
+  fetch(`/notifications/toggle/${id}/`, {
+    method: 'POST',
+    headers: {
+      'X-CSRFToken': getCookie('csrftoken'),
+      'Accept': 'application/json'
+    },
+    credentials: 'same-origin'
+  }).then(r => r.json()).then(data => {
+    if(!data.ok){
+      alert(data.error || 'Failed to update notification');
+      return;
+    }
+    // update button text and row style
+    btn.textContent = data.read ? 'Mark unread' : 'Mark read';
+    const li = btn.closest('li');
+    if(data.read) li.classList.add('list-group-item-light'); else li.classList.remove('list-group-item-light');
+  }).catch(()=> alert('Network error'));
+});
+</script>
+{% endblock %}
+</div>
+{% endblock %}

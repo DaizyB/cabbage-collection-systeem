@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Login</h2>
+{% if errors %}
+  <div class="alert alert-danger">
+    <ul class="mb-0">
+      {% for e in errors %}
+        <li>{{ e }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+{% endif %}
+
+<form method="post">
+  {% csrf_token %}
+  <div class="mb-3"><label>Username</label><input class="form-control" name="username" value="{{ username|default:'' }}"></div>
+  <div class="mb-3"><label>Password</label><input type="password" class="form-control" name="password"></div>
+  <button class="btn btn-primary" type="submit">Log in</button>
+</form>
+{% endblock %}

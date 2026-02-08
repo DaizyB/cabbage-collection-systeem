@@ -1,0 +1,12 @@
+[tool.poetry]
+name = "trash-management"
+version = "0.1.0"
+description = "Regional Trash Management Django app"
+authors = ["Your Name <you@example.com>"]
+
+[tool.black]
+line-length = 88
+
+[tool.flake8]
+max-line-length = 88
+extend-ignore = E203

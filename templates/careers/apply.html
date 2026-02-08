@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Become a Collector</h2>
+{% if errors %}
+  <div class="alert alert-danger">
+    <ul>
+      {% for e in errors %}<li>{{ e }}</li>{% endfor %}
+    </ul>
+  </div>
+{% endif %}
+<form method="post" enctype="multipart/form-data">
+  {% csrf_token %}
+  <div class="row">
+    <div class="col-md-6 mb-3"><label>Full name</label><input name="full_name" class="form-control" value="{{ data.full_name }}"></div>
+    <div class="col-md-6 mb-3"><label>Phone</label><input name="phone" class="form-control" value="{{ data.phone }}"></div>
+  </div>
+  <div class="row">
+    <div class="col-md-6 mb-3"><label>Email</label><input name="email" class="form-control" value="{{ data.email }}"></div>
+    <div class="col-md-6 mb-3"><label>National ID / Passport</label><input name="national_id" class="form-control" value="{{ data.national_id }}"></div>
+  </div>
+
+  <h4>Driving & Vehicle (if applicable)</h4>
+  <div class="row">
+    <div class="col-md-4 mb-3"><label>Driving license number</label><input name="driving_license_number" class="form-control" value="{{ data.driving_license_number }}"></div>
+    <div class="col-md-4 mb-3"><label>License class</label><input name="license_class" class="form-control" value="{{ data.license_class }}"></div>
+    <div class="col-md-4 mb-3"><label>License expiry (YYYY-MM-DD)</label><input name="license_expiry" class="form-control" value="{{ data.license_expiry }}"></div>
+  </div>
+  <div class="row">
+    <div class="col-md-6 mb-3"><label>Vehicle number plate</label><input name="vehicle_number_plate" class="form-control" value="{{ data.vehicle_number_plate }}"></div>
+    <div class="col-md-6 mb-3"><label>Vehicle type</label>
+      <select name="vehicle_type" class="form-select">
+        <option value="truck">Truck</option>
+        <option value="pickup">Pickup</option>
+        <option value="compactor">Compactor</option>
+        <option value="other">Other</option>
+      </select>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Ownership</label>
+      <select class="form-select" name="ownership">
+        <option value="personal">Personal</option>
+        <option value="company">Company</option>
+      </select>
+      <div class="form-text">Select whether the vehicle is company-owned or personal.</div>
+    </div>
+  </div>
+
+  <h4>Uploads (keep to 2–3)</h4>
+  <div class="mb-3"><label>Resume (optional)</label><input type="file" name="resume" class="form-control"></div>
+  <div class="mb-3"><label>Photo of National ID (recommended)</label><input type="file" name="id_photo" class="form-control"></div>
+  <div class="mb-3"><label>Photo of Driving License (recommended)</label><input type="file" name="license_photo" class="form-control"></div>
+  <div class="mb-3"><label>Photo of number plate / logbook (recommended)</label><input type="file" name="plate_photo" class="form-control"></div>
+  <div class="mb-3"><label>Optional selfie holding ID</label><input type="file" name="selfie_photo" class="form-control"></div>
+
+  <h4>Short qualification test</h4>
+  <p>Please answer the following (pass mark: 70%).</p>
+  <div class="mb-2">Q1. Do you currently hold a valid driving license? (auto-fail if No)<br>
+    <label><input type="radio" name="q1" value="yes"> Yes</label>
+    <label class="ms-3"><input type="radio" name="q1" value="no"> No</label>
+  </div>
+  <div class="mb-2">Q2. What should you do if waste is leaking from your truck?<br>
+    <label><input type="radio" name="q2" value="A"> A. Ignore it</label><br>
+    <label><input type="radio" name="q2" value="B"> B. Report and secure it immediately</label><br>
+    <label><input type="radio" name="q2" value="C"> C. Continue to destination</label><br>
+    <label><input type="radio" name="q2" value="D"> D. Wash it with water</label>
+  </div>
+  <div class="mb-2">Q3. Which item requires special handling?<br>
+    <label><input type="radio" name="q3" value="A"> A. Food waste</label><br>
+    <label><input type="radio" name="q3" value="B"> B. Plastic bottles</label><br>
+    <label><input type="radio" name="q3" value="C"> C. Broken glass</label><br>
+    <label><input type="radio" name="q3" value="D"> D. Paper</label>
+  </div>
+  <div class="mb-2">Q4. If a customer is not present at pickup time, what should you do?<br>
+    <label><input type="radio" name="q4" value="A"> A. Enter the property</label><br>
+    <label><input type="radio" name="q4" value="B"> B. Skip and mark the pickup with a note</label><br>
+    <label><input type="radio" name="q4" value="C"> C. Wait indefinitely</label><br>
+    <label><input type="radio" name="q4" value="D"> D. Take waste from inside</label>
+  </div>
+  <div class="mb-2">Q5. Safety gear is important because:<br>
+    <label><input type="radio" name="q5" value="A"> A. It looks professional</label><br>
+    <label><input type="radio" name="q5" value="B"> B. It protects against injuries and health risks</label><br>
+    <label><input type="radio" name="q5" value="C"> C. It saves time</label><br>
+    <label><input type="radio" name="q5" value="D"> D. Customers expect it</label>
+  </div>
+
+  <div class="form-check mb-3">
+    <input class="form-check-input" type="checkbox" id="declaration" name="declaration">
+    <label class="form-check-label" for="declaration">I confirm that the information I have provided is accurate and I understand that false information may lead to rejection or termination.</label>
+  </div>
+
+  <button class="btn btn-primary" type="submit">Apply</button>
+</form>
+{% endblock %}

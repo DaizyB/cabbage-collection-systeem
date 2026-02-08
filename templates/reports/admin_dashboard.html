@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Admin Dashboard</h2>
+<p>Total pickups: {{ total_pickups }}</p>
+<canvas id="stateChart" width="400" height="200"></canvas>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  const ctx = document.getElementById('stateChart').getContext('2d');
+  const data = {
+    labels: {{ state_counts.keys|list|safe }},
+    datasets: [{
+      label: 'Pickups by state',
+      data: {{ state_counts.values|list|safe }},
+      backgroundColor: ['#007bff', '#28a745', '#6c757d', '#dc3545']
+    }]
+  };
+  new Chart(ctx, {type: 'bar', data: data});
+</script>
+{% endblock %}

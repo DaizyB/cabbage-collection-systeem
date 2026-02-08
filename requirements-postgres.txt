@@ -1,0 +1,3 @@
+psycopg2-binary==2.9.7
+# If you prefer building from source and have pg_config available use:
+# psycopg2==2.9.7

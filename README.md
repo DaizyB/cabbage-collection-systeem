@@ -2,14 +2,12 @@ Trash Management - PythonAnywhere Deployment Guide
 
 Overview
 --------
-This project is a Django 4.2 application intended to run on the PythonAnywhere free tier.
-
+This project is a Django 4.2 application
 Quickstart (PythonAnywhere)
 ----------------------------
-1. Create a PythonAnywhere account and open a Bash console.
-2. Clone your repo and create a virtualenv with Python 3.11:
-
+how to set up
 ```bash
+git clone https://github.com/DaizyB/cabbage-collection-systeem.git
 python3.11 -m venv ~/.virtualenvs/trash-mgmt
 source ~/.virtualenvs/trash-mgmt/bin/activate
 pip install -r requirements.txt

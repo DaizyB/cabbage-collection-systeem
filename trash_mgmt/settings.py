@@ -1,24 +1,29 @@
+
 import os
 from pathlib import Path
 from typing import Any
-
 from dotenv import load_dotenv
+import warnings
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 ENV_FILE = BASE_DIR / ".env"
-
 if ENV_FILE.exists():
     load_dotenv(dotenv_path=ENV_FILE, override=True)
 else:
-    raise RuntimeError(f".env file not found at {ENV_FILE}")
-
+    if os.environ.get("GITHUB_ACTIONS") == "true" or os.environ.get("CI") == "true":
+        
+        pass
+    else:
+        warnings.warn(f".env file not found at {ENV_FILE}; continuing without it. "
+                      "Set environment variables or create a .env for local development.")
 
 def env(key: str, default: Any = None, required: bool = False):
     value = os.environ.get(key, default)
     if required and (value is None or value == ''):
         raise RuntimeError(f"Missing required environment variable: {key}")
     return value
+
 
 
 
@@ -35,7 +40,7 @@ if DJANGO_ENV == 'prod' and SECRET_KEY == 'unsafe-dev-key':
 
 DEBUG = True if DJANGO_ENV == 'dev' else False
 
-# ALLOWED_HOSTS: safely parse comma-separated values (ignore empty)
+
 _allowed = env('DJ_ALLOWED_HOSTS', '')
 ALLOWED_HOSTS = [h.strip() for h in _allowed.split(',') if h.strip()] if _allowed else ['*']
 
@@ -148,7 +153,7 @@ if DJANGO_ENV == 'prod':
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
 
-# Install python-dotenv if not already installed
+
 try:
     import dotenv
 except ImportError:

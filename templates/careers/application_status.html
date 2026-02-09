@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Collector Application Status</h2>
+<div class="card">
+  <div class="card-body">
+    <h5 class="card-title">Status: <span class="badge bg-secondary">{{ application.get_status_display }}</span></h5>
+    <p class="card-text">{{ status_message }}</p>
+    <p class="small text-muted">Submitted: {{ application.applied_at }}{% if application.status_changed_at %} — Last update: {{ application.status_changed_at }}{% endif %}</p>
+    {% if cta == 'Go to dashboard' %}
+      <a href="{% url 'accounts:dashboard' %}" class="btn btn-primary">Go to Collector Dashboard</a>
+    {% elif cta == 'View details' %}
+      <a href="{% url 'careers:apply-collector' %}" class="btn btn-outline-primary">View submitted details</a>
+    {% elif cta == 'Contact admin' %}
+      <a href="/contact/" class="btn btn-outline-danger">Contact admin</a>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

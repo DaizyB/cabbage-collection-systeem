@@ -8,7 +8,7 @@
     </ul>
   </div>
 {% endif %}
-<form method="post" enctype="multipart/form-data">
+<form method="post" enctype="multipart/form-data" id="collectorApplyForm">
   {% csrf_token %}
   <div class="row">
     <div class="col-md-6 mb-3"><label>Full name</label><input name="full_name" class="form-control" value="{{ data.full_name }}"></div>
@@ -89,5 +89,55 @@
   </div>
 
   <button class="btn btn-primary" type="submit">Apply</button>
+</form>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const form = document.getElementById('collectorApplyForm');
+  form.addEventListener('submit', function(e) {
+    let firstInvalid = null;
+    let valid = true;
+    // List of required fields
+    const required = [
+      'full_name', 'phone', 'email', 'national_id',
+      'driving_license_number', 'license_class', 'license_expiry',
+      'vehicle_number_plate', 'vehicle_type', 'ownership',
+      'q1', 'q2', 'q3', 'q4', 'q5', 'declaration'
+    ];
+    // Remove previous highlights
+    form.querySelectorAll('.form-control, .form-select, .form-check-input').forEach(el => {
+      el.style.borderColor = '';
+    });
+    // Validate required fields
+    for (let name of required) {
+      let el = form.querySelector(`[name="${name}"]`);
+      if (!el) continue;
+      let value = null;
+      if (el.type === 'checkbox') {
+        value = el.checked;
+      } else if (el.type === 'radio') {
+        // For radios, check if any in group is checked
+        let radios = form.querySelectorAll(`[name="${name}"]`);
+        value = Array.from(radios).some(r => r.checked);
+        el = radios[0];
+      } else {
+        value = el.value.trim();
+      }
+      if (!value) {
+        valid = false;
+        el.style.borderColor = 'red';
+        if (!firstInvalid) firstInvalid = el;
+      }
+    }
+    if (!valid) {
+      e.preventDefault();
+      if (firstInvalid) {
+        firstInvalid.scrollIntoView({behavior: 'smooth', block: 'center'});
+        firstInvalid.focus();
+      }
+    }
+  });
+});
+</script
 </form>
 {% endblock %}

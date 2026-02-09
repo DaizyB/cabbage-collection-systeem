@@ -1,6 +1,34 @@
 from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from .models import CollectorApplication
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import get_object_or_404
+from django.utils import timezone
+
+
+@login_required
+def application_status(request):
+    # Show the latest application for this user (by user link or email)
+    qs = CollectorApplication.objects.filter(user=request.user)
+    if not qs.exists():
+        # fallback: try by email match
+        qs = CollectorApplication.objects.filter(email__iexact=request.user.email)
+    app = qs.order_by('-applied_at').first()
+    if not app:
+        return redirect('careers:apply-collector')
+    # Map status to message / CTA
+    status = app.status
+    messages = {
+        app.APPLICATION_SUBMITTED: ("Your application has been submitted successfully.", "View details"),
+        app.APPLICATION_UNDER_REVIEW: ("Your application is currently under review. Please check back later.", None),
+        app.KYC_UNDER_VERIFICATION: ("Your KYC documents are being verified.", None),
+        app.KYC_VERIFICATION_FAILED: ("KYC verification failed. Please contact our administrator.", "Contact admin"),
+        app.APPLICATION_APPROVED: ("Your application has passed review. You can now access the Collector Dashboard.", "Go to dashboard"),
+        app.APPLICATION_REJECTED: ("Your application was rejected. Please contact admin for details.", "Contact admin"),
+    }
+    message, cta = messages.get(status, ("Status: " + status, None))
+    context = {'application': app, 'status_message': message, 'cta': cta}
+    return render(request, 'careers/application_status.html', context)
 
 
 def apply_collector(request):
@@ -20,6 +48,9 @@ def apply_collector(request):
         driving_license_number = request.POST.get('driving_license_number')
         license_class = request.POST.get('license_class')
         license_expiry = request.POST.get('license_expiry') or None
+        # Normalize date format if present
+        if license_expiry:
+            license_expiry = license_expiry.replace('/', '-')
         vehicle_number_plate = request.POST.get('vehicle_number_plate')
         vehicle_type = request.POST.get('vehicle_type') or 'truck'
         ownership = request.POST.get('ownership') or 'personal'
@@ -83,20 +114,29 @@ def apply_collector(request):
             selfie_photo=selfie_photo,
             answers=answers,
         )
+        # Link application to authenticated user when available
+        if request.user.is_authenticated:
+            a.user = request.user
+            a.save()
 
         # Evaluate test and set status
         try:
             a.evaluate_test()
         except Exception:
             # evaluation shouldn't block submission; mark for manual review
-            a.status = CollectorApplication.STATUS_KYC_REVIEW
+            a.status = CollectorApplication.APPLICATION_UNDER_REVIEW
+            a.status_changed_at = timezone.now()
+            a.save()
+        # ensure initial status/timestamp when submitted
+        if not a.status_changed_at:
+            a.status_changed_at = a.applied_at
             a.save()
         # If JSON or AJAX, return JSON for API consumers
         is_ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest' or request.content_type == 'application/json'
         if is_ajax:
             return JsonResponse({'ok': True, 'id': a.id})
         # For standard browser form posts, redirect to a success page
-        return redirect('apply-success')
+        return redirect('careers:apply-success')
     return render(request, 'careers/apply.html')
 
 

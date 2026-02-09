@@ -1,20 +1,24 @@
 from django.db import models
 from django.utils import timezone
+from django.conf import settings
 
 
 class CollectorApplication(models.Model):
-    STATUS_PENDING = 'PENDING_VERIFICATION'
-    STATUS_FAILED_TEST = 'FAILED_TEST'
-    STATUS_KYC_REVIEW = 'KYC_REVIEW'
-    STATUS_APPROVED = 'APPROVED_COLLECTOR'
-    STATUS_REJECTED = 'REJECTED'
+    APPLICATION_SUBMITTED = 'APPLICATION_SUBMITTED'
+    APPLICATION_UNDER_REVIEW = 'APPLICATION_UNDER_REVIEW'
+    APPLICATION_APPROVED = 'APPLICATION_APPROVED'
+    KYC_UNDER_VERIFICATION = 'KYC_UNDER_VERIFICATION'
+    KYC_VERIFICATION_FAILED = 'KYC_VERIFICATION_FAILED'
+    APPLICATION_REJECTED = 'APPLICATION_REJECTED'
+    STATUS_REJECTED = APPLICATION_REJECTED  # For admin compatibility
 
     STATUS_CHOICES = [
-        (STATUS_PENDING, 'Pending verification'),
-        (STATUS_FAILED_TEST, 'Failed test'),
-        (STATUS_KYC_REVIEW, 'KYC review'),
-        (STATUS_APPROVED, 'Approved collector'),
-        (STATUS_REJECTED, 'Rejected'),
+        (APPLICATION_SUBMITTED, 'Submitted'),
+        (APPLICATION_UNDER_REVIEW, 'Under review'),
+        (KYC_UNDER_VERIFICATION, 'KYC under verification'),
+        (KYC_VERIFICATION_FAILED, 'KYC verification failed'),
+        (APPLICATION_APPROVED, 'Approved collector'),
+        (APPLICATION_REJECTED, 'Rejected'),
     ]
 
     # Personal identity
@@ -45,10 +49,12 @@ class CollectorApplication(models.Model):
     answers = models.JSONField(default=dict, blank=True)
     test_score = models.IntegerField(null=True, blank=True)
     test_passed = models.BooleanField(default=False)
-    status = models.CharField(max_length=32, choices=STATUS_CHOICES, default=STATUS_PENDING)
+    status = models.CharField(max_length=32, choices=STATUS_CHOICES, default=APPLICATION_SUBMITTED)
 
     applied_at = models.DateTimeField(default=timezone.now)
     reviewed = models.BooleanField(default=False)
+    status_changed_at = models.DateTimeField(null=True, blank=True)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL)
 
     def __str__(self):
         return f"Application {self.full_name} ({self.email})"

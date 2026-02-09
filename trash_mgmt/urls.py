@@ -4,13 +4,14 @@ from . import views
 
 urlpatterns = [
     path('', views.home, name='home'),
+    path('contact/', views.contact, name='contact'),
     path('admin/', admin.site.urls),
-    path('accounts/', include('apps.accounts.urls')),
+    path('accounts/', include(('apps.accounts.urls', 'accounts'), namespace='accounts')),
     path('customers/', include('apps.customers.urls')),
     path('collectors/', include('apps.collectors.urls')),
     path('pickups/', include('apps.pickups.urls')),
     path('payments/', include('apps.payments.urls')),
-    path('careers/', include('apps.careers.urls')),
+    path('careers/', include(('apps.careers.urls', 'careers'), namespace='careers')),
     path('quizzes/', include('apps.quizzes.urls')),
     path('notifications/', include('apps.notifications.urls')),
     path('reports/', include('apps.reports.urls')),

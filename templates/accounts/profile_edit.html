@@ -1,0 +1,155 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Edit Profile</h2>
+<form method="post" action="" id="profileEditForm">
+  {% csrf_token %}
+  <div class="mb-3">
+    <label class="form-label">Phone</label>
+    <input type="text" name="phone" class="form-control" value="{{ profile.phone }}" />
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Backup contact</label>
+    <input type="text" name="backup_contact" class="form-control" value="{{ profile.backup_contact }}" />
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Notification method</label>
+    <select name="notification_method" class="form-select">
+      <option value="sms" {% if profile.notification_method == 'sms' %}selected{% endif %}>SMS</option>
+      <option value="email" {% if profile.notification_method == 'email' %}selected{% endif %}>Email</option>
+      <option value="inapp" {% if profile.notification_method == 'inapp' %}selected{% endif %}>In-app</option>
+    </select>
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Preferred days</label>
+    <input type="text" name="preferred_days" class="form-control" value="{{ profile.preferred_days }}" placeholder="Mon,Tue,Fri" />
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Preferred time</label>
+    <select name="preferred_time" class="form-select">
+      <option value="morning" {% if profile.preferred_time == 'morning' %}selected{% endif %}>Morning</option>
+      <option value="afternoon" {% if profile.preferred_time == 'afternoon' %}selected{% endif %}>Afternoon</option>
+      <option value="evening" {% if profile.preferred_time == 'evening' %}selected{% endif %}>Evening</option>
+    </select>
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Trash types</label>
+    <input type="text" name="trash_types" class="form-control" value="{{ profile.trash_types }}" placeholder="household,recyclable" />
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Special instructions</label>
+    <textarea name="special_instructions" class="form-control" rows="2">{{ profile.special_instructions }}</textarea>
+  </div>
+  <hr />
+  <h5>Pickup Location</h5>
+  <div class="mb-3">
+    <label class="form-label">Address</label>
+    <input type="text" id="address_text" name="address_text" class="form-control" value="{{ profile.address_text }}" />
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Region</label>
+    <input type="text" id="region" name="region" class="form-control" value="{{ profile.region }}" />
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Landmark</label>
+    <input type="text" id="landmark" name="landmark" class="form-control" value="{{ profile.landmark }}" />
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Latitude</label>
+    <input type="text" id="latitude" name="latitude" class="form-control" value="{{ profile.latitude }}" readonly />
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Longitude</label>
+    <input type="text" id="longitude" name="longitude" class="form-control" value="{{ profile.longitude }}" readonly />
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Select location on map</label>
+    <div id="map" style="height: 350px; width: 100%; border:1px solid #ccc;"></div>
+  </div>
+  <script src="https://maps.googleapis.com/maps/api/js?libraries=places"></script>
+  <script>
+    let map, marker;
+    function initMap() {
+      const lat = parseFloat(document.getElementById('latitude').value) || 6.5244;
+      const lng = parseFloat(document.getElementById('longitude').value) || 3.3792;
+      const center = { lat: lat, lng: lng };
+      map = new google.maps.Map(document.getElementById('map'), {
+        center: center,
+        zoom: 14
+      });
+      marker = new google.maps.Marker({
+        position: center,
+        map: map,
+        draggable: true
+      });
+      google.maps.event.addListener(marker, 'dragend', function(evt) {
+        document.getElementById('latitude').value = evt.latLng.lat().toFixed(6);
+        document.getElementById('longitude').value = evt.latLng.lng().toFixed(6);
+        autofillAddress(evt.latLng);
+      });
+      map.addListener('click', function(e) {
+        marker.setPosition(e.latLng);
+        document.getElementById('latitude').value = e.latLng.lat().toFixed(6);
+        document.getElementById('longitude').value = e.latLng.lng().toFixed(6);
+        autofillAddress(e.latLng);
+      });
+    }
+    function autofillAddress(latLng) {
+      const geocoder = new google.maps.Geocoder();
+      geocoder.geocode({ location: latLng }, function(results, status) {
+        if (status === 'OK' && results[0]) {
+          document.getElementById('address_text').value = results[0].formatted_address;
+          let region = '', landmark = '';
+          results[0].address_components.forEach(comp => {
+            // Region: administrative_area_level_1 or administrative_area_level_2
+            if (comp.types.includes('administrative_area_level_1')) region = comp.long_name;
+            else if (comp.types.includes('administrative_area_level_2') && !region) region = comp.long_name;
+            // Landmark: point_of_interest, premise, or sublocality
+            if (comp.types.includes('point_of_interest') || comp.types.includes('premise') || comp.types.includes('sublocality')) landmark = comp.long_name;
+          });
+          document.getElementById('region').value = region;
+          document.getElementById('landmark').value = landmark;
+        }
+      });
+    }
+    window.onload = initMap;
+  </script>
+</form>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const form = document.getElementById('profileEditForm');
+  form.addEventListener('submit', function(e) {
+    let firstInvalid = null;
+    let valid = true;
+    // List of required address/location fields
+    const required = [
+      'address_text', 'region', 'latitude', 'longitude'
+    ];
+    // Remove previous highlights
+    form.querySelectorAll('.form-control').forEach(el => {
+      el.style.borderColor = '';
+    });
+    // Validate required fields
+    for (let name of required) {
+      let el = form.querySelector(`[name="${name}"]`);
+      if (!el) continue;
+      let value = el.value.trim();
+      if (!value) {
+        valid = false;
+        el.style.borderColor = 'red';
+        if (!firstInvalid) firstInvalid = el;
+      }
+    }
+    if (!valid) {
+      e.preventDefault();
+      if (firstInvalid) {
+        firstInvalid.scrollIntoView({behavior: 'smooth', block: 'center'});
+        firstInvalid.focus();
+        alert('Please fill in all required address/location fields.');
+      }
+    }
+  });
+});
+</script>
+</form>
+{% endblock %}

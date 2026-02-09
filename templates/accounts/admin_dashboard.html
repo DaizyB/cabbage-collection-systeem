@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Admin Dashboard - All Pickups</h2>
+<table class="table table-bordered">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Customer</th>
+      <th>Collector</th>
+      <th>Address</th>
+      <th>Trash Type</th>
+      <th>Preferred Date</th>
+      <th>Status</th>
+      <th>Completed</th>
+      <th>Release Reason</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for p in pickups %}
+    <tr>
+      <td>{{ p.id }}</td>
+      <td>{{ p.customer }}</td>
+      <td>{% if p.collector %}{{ p.collector.get_full_name|default:p.collector.username }}{% else %}—{% endif %}</td>
+      <td>{{ p.address }}</td>
+      <td>{{ p.trash_type|capfirst }}</td>
+      <td>{{ p.scheduled_time|date:'Y-m-d' }}</td>
+      <td>{{ p.get_state_display }}</td>
+      <td>{% if p.state == 'completed' %}✔{% else %}—{% endif %}</td>
+      <td>{{ p.release_reason }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

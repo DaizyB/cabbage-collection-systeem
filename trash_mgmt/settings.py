@@ -1,41 +1,44 @@
-"""Single-file Django settings for the project.
-
-This consolidates previous package-style settings into one file to simplify
-deployments (e.g., PythonAnywhere). Behavior:
-- Uses `DJANGO_ENV` environment variable to select 'dev' (default) or 'prod'.
-- In `prod` mode, critical environment variables (like `DJ_SECRET_KEY`) are required.
-- Defaults to SQLite for local development.
-
-Security: do not commit secrets; supply via environment variables in production.
-"""
-from pathlib import Path
 import os
+from pathlib import Path
 from typing import Any
+
+from dotenv import load_dotenv
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+ENV_FILE = BASE_DIR / ".env"
+
+if ENV_FILE.exists():
+    load_dotenv(dotenv_path=ENV_FILE, override=True)
+else:
+    raise RuntimeError(f".env file not found at {ENV_FILE}")
+
+
+def env(key: str, default: Any = None, required: bool = False):
+    value = os.environ.get(key, default)
+    if required and (value is None or value == ''):
+        raise RuntimeError(f"Missing required environment variable: {key}")
+    return value
+
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+DJANGO_ENV = env('DJANGO_ENV', 'dev')
 
-def env(key: str, default: Any = None, required: bool = False):
-    v = os.environ.get(key, default)
-    if required and (v is None or v == ''):
-        raise RuntimeError(f'Missing required environment variable: {key}')
-    return v
+SECRET_KEY = env('DJ_SECRET_KEY', 'unsafe-dev-key')
+
+if DJANGO_ENV == 'prod' and SECRET_KEY == 'unsafe-dev-key':
+    raise RuntimeError("DJ_SECRET_KEY must be set in production")
 
 
-# Environment selection
-DJANGO_ENV = env('DJANGO_ENV', 'dev').lower()
 
-# Core
-SECRET_KEY = env('DJ_SECRET_KEY', 'unsafe-dev-key' if DJANGO_ENV == 'dev' else None)
-DEBUG = DJANGO_ENV == 'dev'
+DEBUG = True if DJANGO_ENV == 'dev' else False
 
-if DJANGO_ENV == 'prod' and not SECRET_KEY:
-    raise RuntimeError('DJ_SECRET_KEY must be set in production')
+# ALLOWED_HOSTS: safely parse comma-separated values (ignore empty)
+_allowed = env('DJ_ALLOWED_HOSTS', '')
+ALLOWED_HOSTS = [h.strip() for h in _allowed.split(',') if h.strip()] if _allowed else ['*']
 
-ALLOWED_HOSTS = env('DJ_ALLOWED_HOSTS', '*').split(',') if env('DJ_ALLOWED_HOSTS') else ['*']
-
-# Applications
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -43,10 +46,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
     'rest_framework',
+
     'apps.accounts',
     'apps.customers',
-    'apps.collectors',
+    'apps.collectors.apps.CollectorsConfig',
     'apps.pickups',
     'apps.payments',
     'apps.careers',
@@ -83,30 +88,29 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'trash_mgmt.wsgi.application'
-
 AUTH_USER_MODEL = 'accounts.User'
 
-# Database: default to sqlite for dev; in prod allow env override via DATABASE_URL
 DATABASES = {}
-if env('DATABASE_URL'):
-    # simple DATABASE_URL parsing (postgres example): postgres://USER:PASS@HOST:PORT/NAME
-    url = env('DATABASE_URL')
-    if url.startswith('postgres'):
-        # minimal parsing — for full support use dj-database-url
-        import urllib.parse as up
 
-        parsed = up.urlparse(url)
-        DATABASES['default'] = {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': parsed.path.lstrip('/'),
-            'USER': parsed.username,
-            'PASSWORD': parsed.password,
-            'HOST': parsed.hostname,
-            'PORT': parsed.port or '',
-        }
+DATABASE_URL = env('DATABASE_URL')
+
+if DATABASE_URL:
+    import urllib.parse as up
+
+    parsed = up.urlparse(DATABASE_URL)
+    DATABASES['default'] = {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': parsed.path.lstrip('/'),
+        'USER': parsed.username,
+        'PASSWORD': parsed.password,
+        'HOST': parsed.hostname,
+        'PORT': parsed.port or '',
+    }
 else:
-    DATABASES['default'] = {'ENGINE': 'django.db.backends.sqlite3', 'NAME': str(BASE_DIR / 'db.sqlite3')}
+    DATABASES['default'] = {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
 
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
@@ -122,26 +126,31 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_DIRS = [BASE_DIR / 'static']
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Email defaults
 if DJANGO_ENV == 'dev':
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 else:
     EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
     EMAIL_HOST = env('EMAIL_HOST', '')
-    EMAIL_PORT = int(env('EMAIL_PORT', 587)) if env('EMAIL_PORT') else 587
+    EMAIL_PORT = int(env('EMAIL_PORT', 587))
     EMAIL_HOST_USER = env('EMAIL_HOST_USER', '')
     EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD', '')
     EMAIL_USE_TLS = env('EMAIL_USE_TLS', '1') == '1'
 
-# Security settings for production
 if DJANGO_ENV == 'prod':
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
 
+# Install python-dotenv if not already installed
+try:
+    import dotenv
+except ImportError:
+    import pip
+    pip.main(['install', 'python-dotenv'])

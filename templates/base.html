@@ -24,8 +24,23 @@
             <li class="nav-item"><a class="nav-link" href="/notifications/">Notifications</a></li>
           </ul>
           <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-            <li class="nav-item"><a class="nav-link" href="/accounts/login/">Sign in</a></li>
-            <li class="nav-item"><a class="btn btn-primary ms-2" href="/accounts/signup/">Sign up</a></li>
+            {% if request.user.is_authenticated %}
+              <li class="nav-item d-flex align-items-center">
+                <a class="nav-link" href="{% url 'accounts:dashboard' %}">Dashboard</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="{% url 'accounts:profile' %}">Profile</a>
+              </li>
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="userMenu" data-bs-toggle="dropdown" aria-expanded="false">{{ request.user.get_full_name|default:request.user.username }}</a>
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu">
+                  <li><a class="dropdown-item" href="/accounts/logout/">Sign out</a></li>
+                </ul>
+              </li>
+            {% else %}
+              <li class="nav-item"><a class="nav-link" href="/accounts/login/">Sign in</a></li>
+              <li class="nav-item"><a class="btn btn-primary ms-2" href="/accounts/signup/">Sign up</a></li>
+            {% endif %}
           </ul>
         </div>
       </div>

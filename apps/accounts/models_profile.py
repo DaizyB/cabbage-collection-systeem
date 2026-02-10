@@ -17,6 +17,7 @@ class UserProfile(models.Model):
     landmark = models.CharField(max_length=128, blank=True)
     latitude = models.FloatField(null=True, blank=True)
     longitude = models.FloatField(null=True, blank=True)
+    pickup_qr_token = models.CharField(max_length=64, blank=True)
     # System
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

@@ -82,6 +82,14 @@
   </div>
   <div class="col-md-4">
     <div class="card mb-3">
+      <div class="card-header">Pickup Verification QR</div>
+      <div class="card-body">
+        <p class="small">Show this QR code to your collector when pickup is completed.</p>
+        <div id="pickupQr" style="width: 160px; height: 160px;"></div>
+        <div class="small text-muted mt-2">Code: {{ pickup_qr_token }}</div>
+      </div>
+    </div>
+    <div class="card mb-3">
       <div class="card-header">Notifications</div>
       <div class="card-body">
         {% if notifications %}
@@ -100,4 +108,16 @@
     </div>
   </div>
 </div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+  (function() {
+    const token = "{{ pickup_qr_token|escapejs }}";
+    if (!token) return;
+    new QRCode(document.getElementById('pickupQr'), {
+      text: token,
+      width: 160,
+      height: 160,
+    });
+  })();
+</script>
 {% endblock %}

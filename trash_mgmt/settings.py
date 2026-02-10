@@ -40,6 +40,8 @@ if DJANGO_ENV == 'prod' and SECRET_KEY == 'unsafe-dev-key':
 
 DEBUG = True if DJANGO_ENV == 'dev' else False
 
+GOOGLE_MAPS_API_KEY = env('GOOGLE_MAPS_API_KEY', '')
+
 
 _allowed = env('DJ_ALLOWED_HOSTS', '')
 ALLOWED_HOSTS = [h.strip() for h in _allowed.split(',') if h.strip()] if _allowed else ['*']

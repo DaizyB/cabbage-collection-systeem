@@ -1,5 +1,10 @@
 {% extends 'base.html' %}
 {% block content %}
+{% if messages %}
+  {% for message in messages %}
+    <div class="alert alert-{{ message.tags }} mt-2">{{ message }}</div>
+  {% endfor %}
+{% endif %}
 <h2>Collector Dashboard</h2>
 <p>Welcome, {{ request.user.get_full_name|default:request.user.username }}. (Collector)</p>
 <div class="row">
@@ -18,9 +23,10 @@
                     <div class="small text-muted">Customer: {{ p.customer.get_full_name|default:p.customer.username }}</div>
                   </div>
                   <div>
-                    <form method="post" action="/pickups/{{ p.id }}/mark_collected/">
+                    <form method="post" action="/pickups/{{ p.id }}/mark_collected/" class="pickup-complete-form">
                       {% csrf_token %}
-                      <button class="btn btn-sm btn-success" type="submit">Mark Collected</button>
+                      <input type="text" name="verification_code" class="form-control form-control-sm mb-1" placeholder="Scan/enter QR code" required />
+                      <button class="btn btn-sm btn-success mark-collected-btn" type="submit">Mark Collected</button>
                     </form>
                   </div>
                 </li>
@@ -40,8 +46,10 @@
             {% for p in available %}
               <li class="list-group-item d-flex justify-content-between align-items-start">
                 <div>
-                  <strong>{{ p.get_state_display }}:</strong> {{ p.address }}
-                  <div class="small text-muted">{{ p.scheduled_time }} — Customer: {{ p.customer.get_full_name|default:p.customer.username }}</div>
+                  <strong>{{ p.get_state_display }}:</strong> {{ p.address }}<br>
+                  <span class="small">Type: {{ p.trash_type|capfirst }}</span><br>
+                  <span class="small">Preferred date: {{ p.scheduled_time|date:'Y-m-d' }}</span><br>
+                  <div class="small text-muted">Customer: {{ p.customer.get_full_name|default:p.customer.username }}</div>
                 </div>
                 <div>
                   <form method="post" action="/pickups/{{ p.id }}/accept/">
@@ -79,6 +87,11 @@
                           {% endif %}
                         </div>
                         <div>
+                          <form method="post" action="/pickups/{{ p.id }}/mark_collected/" class="pickup-complete-form mb-2">
+                            {% csrf_token %}
+                            <input type="text" name="verification_code" class="form-control form-control-sm mb-1" placeholder="Scan/enter QR code" required />
+                            <button class="btn btn-sm btn-success mark-collected-btn" type="submit">Mark Collected</button>
+                          </form>
                           <form method="post" action="/pickups/{{ p.id }}/release/">
                             {% csrf_token %}
                             <input type="text" name="reason" class="form-control mb-1" placeholder="Release reason" required />
@@ -93,6 +106,32 @@
                 {% endif %}
               </div>
             </div>
+        <div class="card mb-3">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <span>Completed Pickups (History)</span>
+            <a class="btn btn-sm btn-outline-secondary" href="{% url 'accounts:collector_history' %}">View all</a>
+          </div>
+          <div class="card-body">
+            {% if completed %}
+              <ul class="list-group">
+                {% for p in completed %}
+                  <li class="list-group-item d-flex justify-content-between align-items-start">
+                    <div>
+                      <strong>{{ p.get_state_display }}:</strong> {{ p.address }}
+                      <div class="small text-muted">{{ p.scheduled_time }} — Customer: {{ p.customer.get_full_name|default:p.customer.username }}</div>
+                      <div class="small">Type: {{ p.trash_type|capfirst }} | Preferred date: {{ p.scheduled_time|date:'Y-m-d' }}</div>
+                    </div>
+                    <div class="small text-muted">
+                      {% if p.verified_at %}Verified: {{ p.verified_at }}{% endif %}
+                    </div>
+                  </li>
+                {% endfor %}
+              </ul>
+            {% else %}
+              <p>No completed pickups yet.</p>
+            {% endif %}
+          </div>
+        </div>
         {% if notifications %}
           <hr />
           <h6>Notifications</h6>
@@ -106,4 +145,77 @@
     </div>
   </div>
 </div>
+{% endblock %}
+{% block extra_scripts %}
+<div id="qrScannerModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:1050;">
+  <div style="background:#fff; max-width:420px; margin:10vh auto; padding:16px; border-radius:8px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+      <strong>Scan QR Code</strong>
+      <button id="qrCloseBtn" type="button" class="btn btn-sm btn-outline-secondary">Close</button>
+    </div>
+    <div id="qrReader" style="width:100%;"></div>
+    <div class="small text-muted mt-2">Allow camera access to scan the customer QR code.</div>
+  </div>
+</div>
+<script src="https://unpkg.com/html5-qrcode@2.3.8/minified/html5-qrcode.min.js"></script>
+<script>
+  (function() {
+    const modal = document.getElementById('qrScannerModal');
+    const closeBtn = document.getElementById('qrCloseBtn');
+    let html5Qr = null;
+    let activeInput = null;
+    let activeForm = null;
+
+    function openScanner(targetInput, targetForm) {
+      activeInput = targetInput;
+      activeForm = targetForm;
+      modal.style.display = 'block';
+      if (!html5Qr) {
+        html5Qr = new Html5Qrcode('qrReader');
+      }
+      html5Qr.start(
+        { facingMode: 'environment' },
+        { fps: 10, qrbox: 220 },
+        (decodedText) => {
+          if (activeInput) {
+            activeInput.value = decodedText;
+          }
+          if (activeForm) {
+            activeForm.submit();
+          }
+          closeScanner();
+        },
+        () => {}
+      ).catch(() => {
+        // If camera fails, keep modal open so user can close.
+      });
+    }
+
+    function closeScanner() {
+      modal.style.display = 'none';
+      if (html5Qr) {
+        html5Qr.stop().then(() => html5Qr.clear()).catch(() => {});
+      }
+      activeInput = null;
+      activeForm = null;
+    }
+
+    document.querySelectorAll('.mark-collected-btn').forEach(btn => {
+      btn.addEventListener('click', function(e) {
+        const form = this.closest('form');
+        const input = form ? form.querySelector('input[name="verification_code"]') : null;
+        if (!input) return;
+        if (!input.value.trim()) {
+          e.preventDefault();
+          openScanner(input, form);
+        }
+      });
+    });
+
+    closeBtn.addEventListener('click', closeScanner);
+    modal.addEventListener('click', function(e) {
+      if (e.target === modal) closeScanner();
+    });
+  })();
+</script>
 {% endblock %}

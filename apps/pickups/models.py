@@ -1,5 +1,6 @@
 from django.db import models
 from django.conf import settings
+import secrets
 
 
 class Pickup(models.Model):
@@ -36,6 +37,18 @@ class Pickup(models.Model):
     state = models.CharField(max_length=20, choices=STATE_CHOICES, default=STATE_SCHEDULED)
     created_at = models.DateTimeField(auto_now_add=True)
     proof_photo = models.ImageField(upload_to='proofs/', null=True, blank=True)
+    verification_token = models.CharField(max_length=64, blank=True)
+    verified_at = models.DateTimeField(null=True, blank=True)
+
+    def save(self, *args, **kwargs):
+        if not self.verification_token and self.customer_id:
+            profile = getattr(self.customer, 'profile', None)
+            if profile:
+                if not profile.pickup_qr_token:
+                    profile.pickup_qr_token = secrets.token_urlsafe(16)
+                    profile.save(update_fields=['pickup_qr_token'])
+                self.verification_token = profile.pickup_qr_token
+        super().save(*args, **kwargs)
 
     def assign(self, collector):
         self.collector = collector

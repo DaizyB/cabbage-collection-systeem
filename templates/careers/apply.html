@@ -1,114 +1,265 @@
 {% extends 'base.html' %}
 {% block content %}
-<h2>Become a Collector</h2>
+<h2 class="mb-4"><i class="bi bi-person-badge text-primary me-2"></i>Become a Collector</h2>
 {% if errors %}
   <div class="alert alert-danger">
-    <ul>
+    <ul class="mb-0">
       {% for e in errors %}<li>{{ e }}</li>{% endfor %}
     </ul>
   </div>
 {% endif %}
+
 <form method="post" enctype="multipart/form-data" id="collectorApplyForm">
   {% csrf_token %}
+
+  <!-- Personal Information -->
   <div class="row">
-    <div class="col-md-6 mb-3"><label>Full name</label><input name="full_name" class="form-control" value="{{ data.full_name }}"></div>
-    <div class="col-md-6 mb-3"><label>Phone</label><input name="phone" class="form-control" value="{{ data.phone }}"></div>
+    <div class="col-md-6 mb-3">
+      <label class="form-label fw-semibold">Full name</label>
+      <div class="input-group">
+        <span class="input-group-text"><i class="bi bi-person"></i></span>
+        <input name="full_name" class="form-control" value="{{ data.full_name }}">
+      </div>
+    </div>
+    <div class="col-md-6 mb-3">
+      <label class="form-label fw-semibold">Phone</label>
+      <div class="input-group">
+        <span class="input-group-text"><i class="bi bi-telephone"></i></span>
+        <input name="phone" class="form-control" value="{{ data.phone }}">
+      </div>
+    </div>
   </div>
   <div class="row">
-    <div class="col-md-6 mb-3"><label>Email</label><input name="email" class="form-control" value="{{ data.email }}"></div>
-    <div class="col-md-6 mb-3"><label>National ID / Passport</label><input name="national_id" class="form-control" value="{{ data.national_id }}"></div>
+    <div class="col-md-6 mb-3">
+      <label class="form-label fw-semibold">Email</label>
+      <div class="input-group">
+        <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+        <input name="email" class="form-control" value="{{ data.email }}">
+      </div>
+    </div>
+    <div class="col-md-6 mb-3">
+      <label class="form-label fw-semibold">National ID / Passport</label>
+      <div class="input-group">
+        <span class="input-group-text"><i class="bi bi-card-text"></i></span>
+        <input name="national_id" class="form-control" value="{{ data.national_id }}">
+      </div>
+    </div>
   </div>
 
-  <h4>Driving & Vehicle (if applicable)</h4>
+  <h4 class="mt-4"><i class="bi bi-truck-front text-primary me-2"></i>Driving & Vehicle (if applicable)</h4>
   <div class="row">
-    <div class="col-md-4 mb-3"><label>Driving license number</label><input name="driving_license_number" class="form-control" value="{{ data.driving_license_number }}"></div>
-    <div class="col-md-4 mb-3"><label>License class</label><input name="license_class" class="form-control" value="{{ data.license_class }}"></div>
-    <div class="col-md-4 mb-3"><label>License expiry (YYYY-MM-DD)</label><input name="license_expiry" class="form-control" value="{{ data.license_expiry }}"></div>
+    <div class="col-md-4 mb-3">
+      <label class="form-label fw-semibold">Driving license number</label>
+      <div class="input-group">
+        <span class="input-group-text"><i class="bi bi-credit-card"></i></span>
+        <input name="driving_license_number" class="form-control" value="{{ data.driving_license_number }}">
+      </div>
+    </div>
+    <div class="col-md-4 mb-3">
+      <label class="form-label fw-semibold">License class</label>
+      <div class="input-group">
+        <span class="input-group-text"><i class="bi bi-upc-scan"></i></span>
+        <input name="license_class" class="form-control" value="{{ data.license_class }}">
+      </div>
+    </div>
+    <div class="col-md-4 mb-3">
+      <label class="form-label fw-semibold">License expiry (YYYY-MM-DD)</label>
+      <div class="input-group">
+        <span class="input-group-text"><i class="bi bi-calendar"></i></span>
+        <input name="license_expiry" class="form-control" value="{{ data.license_expiry }}">
+      </div>
+    </div>
   </div>
   <div class="row">
-    <div class="col-md-6 mb-3"><label>Vehicle number plate</label><input name="vehicle_number_plate" class="form-control" value="{{ data.vehicle_number_plate }}"></div>
-    <div class="col-md-6 mb-3"><label>Vehicle type</label>
-      <select name="vehicle_type" class="form-select">
-        <option value="truck">Truck</option>
-        <option value="pickup">Pickup</option>
-        <option value="compactor">Compactor</option>
-        <option value="other">Other</option>
-      </select>
+    <div class="col-md-6 mb-3">
+      <label class="form-label fw-semibold">Vehicle number plate</label>
+      <div class="input-group">
+        <span class="input-group-text"><i class="bi bi-upc-scan"></i></span>
+        <input name="vehicle_number_plate" class="form-control" value="{{ data.vehicle_number_plate }}">
+      </div>
+    </div>
+    <div class="col-md-6 mb-3">
+      <label class="form-label fw-semibold">Vehicle type</label>
+      <div class="input-group">
+        <span class="input-group-text"><i class="bi bi-truck"></i></span>
+        <select name="vehicle_type" class="form-select">
+          <option value="truck">Truck</option>
+          <option value="pickup">Pickup</option>
+          <option value="compactor">Compactor</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
     </div>
     <div class="mb-3">
-      <label class="form-label">Ownership</label>
-      <select class="form-select" name="ownership">
-        <option value="personal">Personal</option>
-        <option value="company">Company</option>
-      </select>
-      <div class="form-text">Select whether the vehicle is company-owned or personal.</div>
+      <label class="form-label fw-semibold">Ownership</label>
+      <div class="input-group">
+        <span class="input-group-text"><i class="bi bi-building"></i></span>
+        <select class="form-select" name="ownership">
+          <option value="personal">Personal</option>
+          <option value="company">Company</option>
+        </select>
+      </div>
+      <div class="form-text text-white">Select whether the vehicle is company-owned or personal.</div>
     </div>
   </div>
 
-  <h4>Uploads (keep to 2–3)</h4>
-  <div class="mb-3"><label>Resume (optional)</label><input type="file" name="resume" class="form-control"></div>
-  <div class="mb-3"><label>Photo of National ID (recommended)</label><input type="file" name="id_photo" class="form-control"></div>
-  <div class="mb-3"><label>Photo of Driving License (recommended)</label><input type="file" name="license_photo" class="form-control"></div>
-  <div class="mb-3"><label>Photo of number plate / logbook (recommended)</label><input type="file" name="plate_photo" class="form-control"></div>
-  <div class="mb-3"><label>Optional selfie holding ID</label><input type="file" name="selfie_photo" class="form-control"></div>
+  <h4 class="mt-4"><i class="bi bi-cloud-upload text-primary me-2"></i>Uploads (keep to 2–3)</h4>
+  <div class="upload-grid">
+    <label class="upload-card">
+      <input type="file" name="resume" class="upload-input" accept=".pdf,.doc,.docx">
+      <div class="upload-inner">
+        <div class="upload-icon"><i class="bi bi-file-earmark-text"></i></div>
+        <div class="upload-title">Resume (optional)</div>
+        <div class="upload-sub">Tap to upload</div>
+        <img class="upload-preview" alt="Resume preview" />
+      </div>
+    </label>
 
-  <h4>Short qualification test</h4>
+    <label class="upload-card">
+      <input type="file" name="id_photo" class="upload-input" accept="image/*">
+      <div class="upload-inner">
+        <div class="upload-icon"><i class="bi bi-card-image"></i></div>
+        <div class="upload-title">National ID Photo</div>
+        <div class="upload-sub">Tap to upload</div>
+        <img class="upload-preview" alt="ID preview" />
+      </div>
+    </label>
+
+    <label class="upload-card">
+      <input type="file" name="license_photo" class="upload-input" accept="image/*">
+      <div class="upload-inner">
+        <div class="upload-icon"><i class="bi bi-card-image"></i></div>
+        <div class="upload-title">Driving License Photo</div>
+        <div class="upload-sub">Tap to upload</div>
+        <img class="upload-preview" alt="License preview" />
+      </div>
+    </label>
+
+    <label class="upload-card">
+      <input type="file" name="plate_photo" class="upload-input" accept="image/*">
+      <div class="upload-inner">
+        <div class="upload-icon"><i class="bi bi-truck"></i></div>
+        <div class="upload-title">Number Plate / Logbook</div>
+        <div class="upload-sub">Tap to upload</div>
+        <img class="upload-preview" alt="Plate preview" />
+      </div>
+    </label>
+
+    <label class="upload-card">
+      <input type="file" name="selfie_photo" class="upload-input" accept="image/*">
+      <div class="upload-inner">
+        <div class="upload-icon"><i class="bi bi-person-square"></i></div>
+        <div class="upload-title">Selfie Holding ID</div>
+        <div class="upload-sub">Tap to upload</div>
+        <img class="upload-preview" alt="Selfie preview" />
+      </div>
+    </label>
+  </div>
+
+  <h4 class="mt-4"><i class="bi bi-pencil-square text-primary me-2"></i>Short qualification test</h4>
   <p>Please answer the following (pass mark: 70%).</p>
-  <div class="mb-2">Q1. Do you currently hold a valid driving license? (auto-fail if No)<br>
-    <label><input type="radio" name="q1" value="yes"> Yes</label>
-    <label class="ms-3"><input type="radio" name="q1" value="no"> No</label>
-  </div>
-  <div class="mb-2">Q2. What should you do if waste is leaking from your truck?<br>
-    <label><input type="radio" name="q2" value="A"> A. Ignore it</label><br>
-    <label><input type="radio" name="q2" value="B"> B. Report and secure it immediately</label><br>
-    <label><input type="radio" name="q2" value="C"> C. Continue to destination</label><br>
-    <label><input type="radio" name="q2" value="D"> D. Wash it with water</label>
-  </div>
-  <div class="mb-2">Q3. Which item requires special handling?<br>
-    <label><input type="radio" name="q3" value="A"> A. Food waste</label><br>
-    <label><input type="radio" name="q3" value="B"> B. Plastic bottles</label><br>
-    <label><input type="radio" name="q3" value="C"> C. Broken glass</label><br>
-    <label><input type="radio" name="q3" value="D"> D. Paper</label>
-  </div>
-  <div class="mb-2">Q4. If a customer is not present at pickup time, what should you do?<br>
-    <label><input type="radio" name="q4" value="A"> A. Enter the property</label><br>
-    <label><input type="radio" name="q4" value="B"> B. Skip and mark the pickup with a note</label><br>
-    <label><input type="radio" name="q4" value="C"> C. Wait indefinitely</label><br>
-    <label><input type="radio" name="q4" value="D"> D. Take waste from inside</label>
-  </div>
-  <div class="mb-2">Q5. Safety gear is important because:<br>
-    <label><input type="radio" name="q5" value="A"> A. It looks professional</label><br>
-    <label><input type="radio" name="q5" value="B"> B. It protects against injuries and health risks</label><br>
-    <label><input type="radio" name="q5" value="C"> C. It saves time</label><br>
-    <label><input type="radio" name="q5" value="D"> D. Customers expect it</label>
+
+  <div class="quiz-card mb-4">
+    <div class="quiz-grid">
+      <div class="quiz-item">
+        <div class="quiz-title">Q1. Do you currently hold a valid driving license? (auto-fail if No)</div>
+        <div class="quiz-options">
+          <label class="quiz-option"><input type="radio" name="q1" value="yes"><span>Yes</span></label>
+          <label class="quiz-option"><input type="radio" name="q1" value="no"><span>No</span></label>
+        </div>
+      </div>
+
+      <div class="quiz-item">
+        <div class="quiz-title">Q2. What should you do if waste is leaking from your truck?</div>
+        <div class="quiz-options">
+          <label class="quiz-option"><input type="radio" name="q2" value="A"><span>A. Ignore it</span></label>
+          <label class="quiz-option"><input type="radio" name="q2" value="B"><span>B. Report and secure it immediately</span></label>
+          <label class="quiz-option"><input type="radio" name="q2" value="C"><span>C. Continue to destination</span></label>
+          <label class="quiz-option"><input type="radio" name="q2" value="D"><span>D. Wash it with water</span></label>
+        </div>
+      </div>
+
+      <div class="quiz-item">
+        <div class="quiz-title">Q3. Which item requires special handling?</div>
+        <div class="quiz-options">
+          <label class="quiz-option"><input type="radio" name="q3" value="A"><span>A. Food waste</span></label>
+          <label class="quiz-option"><input type="radio" name="q3" value="B"><span>B. Plastic bottles</span></label>
+          <label class="quiz-option"><input type="radio" name="q3" value="C"><span>C. Broken glass</span></label>
+          <label class="quiz-option"><input type="radio" name="q3" value="D"><span>D. Paper</span></label>
+        </div>
+      </div>
+
+      <div class="quiz-item">
+        <div class="quiz-title">Q4. If a customer is not present at pickup time, what should you do?</div>
+        <div class="quiz-options">
+          <label class="quiz-option"><input type="radio" name="q4" value="A"><span>A. Enter the property</span></label>
+          <label class="quiz-option"><input type="radio" name="q4" value="B"><span>B. Skip and mark the pickup with a note</span></label>
+          <label class="quiz-option"><input type="radio" name="q4" value="C"><span>C. Wait indefinitely</span></label>
+          <label class="quiz-option"><input type="radio" name="q4" value="D"><span>D. Take waste from inside</span></label>
+        </div>
+      </div>
+
+      <div class="quiz-item">
+        <div class="quiz-title">Q5. Safety gear is important because:</div>
+        <div class="quiz-options">
+          <label class="quiz-option"><input type="radio" name="q5" value="A"><span>A. It looks professional</span></label>
+          <label class="quiz-option"><input type="radio" name="q5" value="B"><span>B. It protects against injuries and health risks</span></label>
+          <label class="quiz-option"><input type="radio" name="q5" value="C"><span>C. It saves time</span></label>
+          <label class="quiz-option"><input type="radio" name="q5" value="D"><span>D. Customers expect it</span></label>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <div class="form-check mb-3">
+  <div class="form-check mb-4">
     <input class="form-check-input" type="checkbox" id="declaration" name="declaration">
-    <label class="form-check-label" for="declaration">I confirm that the information I have provided is accurate and I understand that false information may lead to rejection or termination.</label>
+    <label class="form-check-label" for="declaration">
+      I confirm that the information I have provided is accurate and I understand that false information may lead to rejection or termination.
+    </label>
   </div>
 
-  <button class="btn btn-primary" type="submit">Apply</button>
+  <button class="btn btn-primary btn-lg px-5" type="submit">
+    <i class="bi bi-send me-2"></i>Apply
+  </button>
 </form>
 
+<!-- Original validation script – preserved, only borderColor logic remains -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
   const form = document.getElementById('collectorApplyForm');
+  form.querySelectorAll('.upload-input').forEach(input => {
+    input.addEventListener('change', function() {
+      const card = this.closest('.upload-card');
+      const preview = card ? card.querySelector('.upload-preview') : null;
+      if (!preview) return;
+      if (this.files && this.files[0]) {
+        const file = this.files[0];
+        if (file.type && file.type.startsWith('image/')) {
+          preview.src = URL.createObjectURL(file);
+          card.classList.add('has-preview');
+        } else {
+          preview.removeAttribute('src');
+          card.classList.remove('has-preview');
+        }
+      } else {
+        preview.removeAttribute('src');
+        card.classList.remove('has-preview');
+      }
+    });
+  });
+
   form.addEventListener('submit', function(e) {
     let firstInvalid = null;
     let valid = true;
-    // List of required fields
     const required = [
       'full_name', 'phone', 'email', 'national_id',
       'driving_license_number', 'license_class', 'license_expiry',
       'vehicle_number_plate', 'vehicle_type', 'ownership',
       'q1', 'q2', 'q3', 'q4', 'q5', 'declaration'
     ];
-    // Remove previous highlights
     form.querySelectorAll('.form-control, .form-select, .form-check-input').forEach(el => {
       el.style.borderColor = '';
     });
-    // Validate required fields
     for (let name of required) {
       let el = form.querySelector(`[name="${name}"]`);
       if (!el) continue;
@@ -116,7 +267,6 @@ document.addEventListener('DOMContentLoaded', function() {
       if (el.type === 'checkbox') {
         value = el.checked;
       } else if (el.type === 'radio') {
-        // For radios, check if any in group is checked
         let radios = form.querySelectorAll(`[name="${name}"]`);
         value = Array.from(radios).some(r => r.checked);
         el = radios[0];
@@ -138,6 +288,5 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 });
-</script
-</form>
+</script>
 {% endblock %}

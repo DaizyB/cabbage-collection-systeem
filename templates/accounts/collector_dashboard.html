@@ -2,161 +2,201 @@
 {% block content %}
 {% if messages %}
   {% for message in messages %}
-    <div class="alert alert-{{ message.tags }} mt-2">{{ message }}</div>
+    <div class="alert alert-{{ message.tags }} mt-2 d-flex align-items-center">
+      <i class="bi bi-info-circle-fill me-2"></i>{{ message }}
+    </div>
   {% endfor %}
 {% endif %}
-<h2>Collector Dashboard</h2>
-<p>Welcome, {{ request.user.get_full_name|default:request.user.username }}. (Collector)</p>
-<div class="row">
-  <div class="col-md-8">
-    <div class="card mb-3">
-      <div class="card-header">Today's Assignments</div>
-      <div class="card-body">
-          {% if todays_assignments %}
-            <ul class="list-group">
-              {% for p in todays_assignments %}
-                <li class="list-group-item d-flex justify-content-between align-items-start">
-                  <div>
-                    <strong>{{ p.get_state_display }}:</strong> {{ p.address }}<br>
-                    <span class="small">Type: {{ p.trash_type|capfirst }}</span><br>
-                    <span class="small">Preferred date: {{ p.scheduled_time|date:'Y-m-d' }}</span><br>
-                    <div class="small text-muted">Customer: {{ p.customer.get_full_name|default:p.customer.username }}</div>
-                  </div>
-                  <div>
-                    <form method="post" action="/pickups/{{ p.id }}/mark_collected/" class="pickup-complete-form">
-                      {% csrf_token %}
-                      <input type="text" name="verification_code" class="form-control form-control-sm mb-1" placeholder="Scan/enter QR code" required />
-                      <button class="btn btn-sm btn-success mark-collected-btn" type="submit">Mark Collected</button>
-                    </form>
-                  </div>
-                </li>
-              {% endfor %}
-            </ul>
-          {% else %}
-            <p>No assignments for today.</p>
-          {% endif %}
-      </div>
-    </div>
 
-    <div class="card mb-3">
-      <div class="card-header">Available Pickups</div>
+<div class="collector-dashboard">
+  <h2 class="mb-2"><i class="bi bi-truck-front text-primary me-2"></i>Collector Dashboard</h2>
+  <p class="lead mb-3">Welcome, {{ request.user.get_full_name|default:request.user.username }}. (Collector)</p>
+
+  <div class="collector-dashboard-grid-6">
+    <!-- Top row: two wide cards -->
+    <div class="card mb-3 card-top-left">
+      <div class="card-header bg-transparent">
+        <i class="bi bi-calendar-day me-2"></i>Today's Assignments
+      </div>
       <div class="card-body">
-        {% if available %}
+        {% if todays_assignments %}
           <ul class="list-group">
-            {% for p in available %}
+            {% for p in todays_assignments %}
               <li class="list-group-item d-flex justify-content-between align-items-start">
                 <div>
-                  <strong>{{ p.get_state_display }}:</strong> {{ p.address }}<br>
-                  <span class="small">Type: {{ p.trash_type|capfirst }}</span><br>
-                  <span class="small">Preferred date: {{ p.scheduled_time|date:'Y-m-d' }}</span><br>
-                  <div class="small text-muted">Customer: {{ p.customer.get_full_name|default:p.customer.username }}</div>
+                  <strong><span class="badge bg-primary me-2">{{ p.get_state_display }}</span></strong> {{ p.address }}<br>
+                  <span class="small"><i class="bi bi-tag me-1"></i>Type: {{ p.trash_type|capfirst }}</span><br>
+                  <span class="small"><i class="bi bi-calendar me-1"></i>Preferred date: {{ p.scheduled_time|date:'Y-m-d' }}</span><br>
+                  <div class="small text-muted"><i class="bi bi-person me-1"></i>Customer: {{ p.customer.get_full_name|default:p.customer.username }}</div>
                 </div>
                 <div>
-                  <form method="post" action="/pickups/{{ p.id }}/accept/">
+                  <form method="post" action="/pickups/{{ p.id }}/mark_collected/" class="pickup-complete-form">
                     {% csrf_token %}
-                    <button class="btn btn-sm btn-primary" type="submit">Accept</button>
+                    <div class="input-group input-group-sm">
+                      <span class="input-group-text bg-white"><i class="bi bi-qr-code"></i></span>
+                      <input type="text" name="verification_code" class="form-control" placeholder="QR code" required />
+                    </div>
+                    <button class="btn btn-sm btn-success mark-collected-btn mt-2 w-100" type="submit">
+                      <i class="bi bi-check2-circle me-1"></i>Mark Collected
+                    </button>
                   </form>
                 </div>
               </li>
             {% endfor %}
           </ul>
         {% else %}
-          <p>No available pickups.</p>
+          <p class="text-muted mb-0"><i class="bi bi-inbox me-1"></i>No assignments for today.</p>
         {% endif %}
       </div>
     </div>
-  </div>
-  <div class="col-md-4">
-    <div class="card mb-3">
-      <div class="card-header">Status</div>
+
+    <div class="card mb-3 card-top-right">
+      <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
+        <span><i class="bi bi-check2-all me-2"></i>Completed Pickups (History)</span>
+        <a class="btn btn-sm btn-outline-primary" href="{% url 'accounts:collector_history' %}">
+          View all <i class="bi bi-arrow-right ms-1"></i>
+        </a>
+      </div>
       <div class="card-body">
-        <p>Completed pickups: <strong>{{ completed_count }}</strong></p>
-        <p>Assigned pickups: <strong>{{ assigned.count }}</strong></p>
-            <div class="card mb-3">
-              <div class="card-header">Assigned Pickups</div>
-              <div class="card-body">
-                {% if assigned %}
-                  <ul class="list-group">
-                    {% for p in assigned %}
-                      <li class="list-group-item d-flex justify-content-between align-items-start">
-                        <div>
-                          <strong>{{ p.get_state_display }}:</strong> {{ p.address }}
-                          <div class="small text-muted">{{ p.scheduled_time }} — Customer: {{ p.customer.get_full_name|default:p.customer.username }}</div>
-                          {% if p.release_reason %}
-                            <div class="small text-danger">Last release reason: {{ p.release_reason }}</div>
-                          {% endif %}
-                        </div>
-                        <div>
-                          <form method="post" action="/pickups/{{ p.id }}/mark_collected/" class="pickup-complete-form mb-2">
-                            {% csrf_token %}
-                            <input type="text" name="verification_code" class="form-control form-control-sm mb-1" placeholder="Scan/enter QR code" required />
-                            <button class="btn btn-sm btn-success mark-collected-btn" type="submit">Mark Collected</button>
-                          </form>
-                          <form method="post" action="/pickups/{{ p.id }}/release/">
-                            {% csrf_token %}
-                            <input type="text" name="reason" class="form-control mb-1" placeholder="Release reason" required />
-                            <button class="btn btn-sm btn-warning" type="submit">Release</button>
-                          </form>
-                        </div>
-                      </li>
-                    {% endfor %}
-                  </ul>
-                {% else %}
-                  <p>No assigned pickups.</p>
+        {% if completed %}
+          <ul class="list-group">
+            {% for p in completed %}
+              <li class="list-group-item">
+                <div class="fw-bold">{{ p.get_state_display }}: {{ p.address }}</div>
+                <div class="small text-muted">{{ p.scheduled_time }} — Customer: {{ p.customer.get_full_name|default:p.customer.username }}</div>
+                <div class="small">Type: {{ p.trash_type|capfirst }} | Preferred date: {{ p.scheduled_time|date:'Y-m-d' }}</div>
+                {% if p.verified_at %}
+                  <div class="small text-success"><i class="bi bi-check-circle"></i> Verified: {{ p.verified_at }}</div>
                 {% endif %}
-              </div>
-            </div>
-        <div class="card mb-3">
-          <div class="card-header d-flex justify-content-between align-items-center">
-            <span>Completed Pickups (History)</span>
-            <a class="btn btn-sm btn-outline-secondary" href="{% url 'accounts:collector_history' %}">View all</a>
-          </div>
-          <div class="card-body">
-            {% if completed %}
-              <ul class="list-group">
-                {% for p in completed %}
-                  <li class="list-group-item d-flex justify-content-between align-items-start">
-                    <div>
-                      <strong>{{ p.get_state_display }}:</strong> {{ p.address }}
-                      <div class="small text-muted">{{ p.scheduled_time }} — Customer: {{ p.customer.get_full_name|default:p.customer.username }}</div>
-                      <div class="small">Type: {{ p.trash_type|capfirst }} | Preferred date: {{ p.scheduled_time|date:'Y-m-d' }}</div>
-                    </div>
-                    <div class="small text-muted">
-                      {% if p.verified_at %}Verified: {{ p.verified_at }}{% endif %}
-                    </div>
-                  </li>
-                {% endfor %}
-              </ul>
-            {% else %}
-              <p>No completed pickups yet.</p>
-            {% endif %}
-          </div>
-        </div>
-        {% if notifications %}
-          <hr />
-          <h6>Notifications</h6>
-          <ul class="list-unstyled">
-            {% for n in notifications %}
-              <li class="small mb-1">{{ n.message }} <span class="text-muted">({{ n.created_at }})</span></li>
+              </li>
             {% endfor %}
           </ul>
+        {% else %}
+          <p class="text-muted mb-0">No completed pickups yet.</p>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Left column stacked -->
+    <div class="card mb-3 card-left-top">
+      <div class="card-header bg-transparent">
+        <i class="bi bi-graph-up me-2"></i>Status
+      </div>
+      <div class="card-body">
+        <p><strong>Completed pickups:</strong> <span class="badge bg-success">{{ completed_count }}</span></p>
+        <p><strong>Assigned pickups:</strong> <span class="badge bg-primary">{{ assigned.count }}</span></p>
+      </div>
+    </div>
+
+    {% if notifications %}
+      <div class="card mb-3 card-left-bottom">
+        <div class="card-header bg-transparent">
+          <i class="bi bi-bell me-2"></i>Notifications
+        </div>
+        <div class="card-body">
+          <ul class="list-unstyled mb-0">
+            {% for n in notifications %}
+              <li class="small mb-2"><i class="bi bi-info-circle text-primary me-1"></i>{{ n.message }} <span class="text-muted">({{ n.created_at }})</span></li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    {% endif %}
+
+    <!-- Center column single -->
+    <div class="card mb-3 card-center-single">
+      <div class="card-header bg-transparent">
+        <i class="bi bi-box-seam me-2"></i>Available Pickups
+      </div>
+      <div class="card-body">
+        {% if available %}
+          <ul class="list-group">
+            {% for p in available %}
+              <li class="list-group-item d-flex justify-content-between align-items-start">
+                <div>
+                  <strong><span class="badge bg-secondary me-2">{{ p.get_state_display }}</span></strong> {{ p.address }}<br>
+                  <span class="small"><i class="bi bi-tag me-1"></i>Type: {{ p.trash_type|capfirst }}</span><br>
+                  <span class="small"><i class="bi bi-calendar me-1"></i>Preferred date: {{ p.scheduled_time|date:'Y-m-d' }}</span><br>
+                  <div class="small text-muted"><i class="bi bi-person me-1"></i>Customer: {{ p.customer.get_full_name|default:p.customer.username }}</div>
+                </div>
+                <div>
+                  <form method="post" action="/pickups/{{ p.id }}/accept/">
+                    {% csrf_token %}
+                    <button class="btn btn-sm btn-primary" type="submit">
+                      <i class="bi bi-check-lg me-1"></i>Accept
+                    </button>
+                  </form>
+                </div>
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p class="text-muted mb-0"><i class="bi bi-inbox me-1"></i>No available pickups.</p>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Right column tall -->
+    <div class="card mb-3 card-right-tall">
+      <div class="card-header bg-transparent">
+        <i class="bi bi-journal-check me-2"></i>Assigned Pickups
+      </div>
+      <div class="card-body">
+        {% if assigned %}
+          <ul class="list-group">
+            {% for p in assigned %}
+              <li class="list-group-item">
+                <div class="fw-bold">{{ p.get_state_display }}: {{ p.address }}</div>
+                <div class="small text-muted">{{ p.scheduled_time }} — Customer: {{ p.customer.get_full_name|default:p.customer.username }}</div>
+                {% if p.release_reason %}
+                  <div class="small text-danger mt-1"><i class="bi bi-exclamation-triangle"></i> Last release: {{ p.release_reason }}</div>
+                {% endif %}
+                <div class="mt-2">
+                  <form method="post" action="/pickups/{{ p.id }}/mark_collected/" class="pickup-complete-form mb-2">
+                    {% csrf_token %}
+                    <div class="input-group input-group-sm">
+                      <span class="input-group-text bg-white"><i class="bi bi-qr-code"></i></span>
+                      <input type="text" name="verification_code" class="form-control" placeholder="QR code" required />
+                    </div>
+                    <button class="btn btn-sm btn-success mark-collected-btn mt-1 w-100" type="submit">
+                      <i class="bi bi-check2-circle me-1"></i>Mark Collected
+                    </button>
+                  </form>
+                  <form method="post" action="/pickups/{{ p.id }}/release/">
+                    {% csrf_token %}
+                    <div class="input-group input-group-sm">
+                      <span class="input-group-text bg-white"><i class="bi bi-pencil"></i></span>
+                      <input type="text" name="reason" class="form-control" placeholder="Release reason" required />
+                    </div>
+                    <button class="btn btn-sm btn-warning mt-1 w-100" type="submit">
+                      <i class="bi bi-arrow-return-left me-1"></i>Release
+                    </button>
+                  </form>
+                </div>
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p class="text-muted mb-0"><i class="bi bi-inbox me-1"></i>No assigned pickups.</p>
         {% endif %}
       </div>
     </div>
   </div>
 </div>
-{% endblock %}
-{% block extra_scripts %}
+
+<!-- QR Scanner Modal – unchanged, but we add an icon -->
 <div id="qrScannerModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:1050;">
-  <div style="background:#fff; max-width:420px; margin:10vh auto; padding:16px; border-radius:8px;">
+  <div style="background:#fff; max-width:420px; margin:10vh auto; padding:16px; border-radius:12px;">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-      <strong>Scan QR Code</strong>
+      <strong><i class="bi bi-qr-code-scan me-2 text-primary"></i>Scan QR Code</strong>
       <button id="qrCloseBtn" type="button" class="btn btn-sm btn-outline-secondary">Close</button>
     </div>
     <div id="qrReader" style="width:100%;"></div>
     <div class="small text-muted mt-2">Allow camera access to scan the customer QR code.</div>
   </div>
 </div>
+
+<!-- QR scripts – untouched -->
 <script src="https://unpkg.com/html5-qrcode@2.3.8/minified/html5-qrcode.min.js"></script>
 <script>
   (function() {
@@ -186,9 +226,7 @@
           closeScanner();
         },
         () => {}
-      ).catch(() => {
-        // If camera fails, keep modal open so user can close.
-      });
+      ).catch(() => {});
     }
 
     function closeScanner() {

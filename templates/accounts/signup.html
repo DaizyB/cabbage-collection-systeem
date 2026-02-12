@@ -1,66 +1,88 @@
 {% extends 'base.html' %}
 {% block content %}
-<h2>Signup</h2>
-{% if form.non_field_errors %}
-  <div class="alert alert-danger">
-    <ul class="mb-0">
-      {% for e in form.non_field_errors %}
-        <li>{{ e }}</li>
-      {% endfor %}
-    </ul>
+<div class="card mx-auto signup-card" style="max-width: 480px;">
+  <div class="card-header bg-transparent text-center">
+    <i class="bi bi-person-plus fs-1 text-primary"></i>
+    <h3 class="mt-2">Sign up</h3>
   </div>
-{% endif %}
-
-<form method="post" action="" id="signup-form" novalidate>
-  {% csrf_token %}
-
-  {% for field in form.visible_fields %}
-    <div class="mb-3">
-      <label for="id_{{ field.name }}" class="form-label">{{ field.label }}{% if field.field.required %} *{% endif %}</label>
-      {% if field.name == 'password1' or field.name == 'password2' %}
-        <div class="input-group">
-          {{ field }}
-          <button type="button" class="btn btn-outline-secondary btn-sm toggle-pw" data-target="id_{{ field.name }}" aria-label="Toggle password visibility">Show</button>
-        </div>
-      {% else %}
-        {{ field }}
-      {% endif %}
-      {% if field.help_text and field.name != 'password1' %}
-        <div class="form-text">{{ field.help_text }}</div>
-      {% endif %}
-      {% if field.errors %}
-        <div class="invalid-feedback d-block">
-          {% for err in field.errors %}
-            {% if field.name == 'password1' %}
-              {% if 'too similar' in err or 'contain at least' in err or 'commonly used' in err or 'entirely numeric' in err %}
-                {# skip default password validator messages #}
-              {% else %}
-                {{ err }}{% if not forloop.last %}<br>{% endif %}
-              {% endif %}
-            {% else %}
-              {{ err }}{% if not forloop.last %}<br>{% endif %}
-            {% endif %}
+  <div class="card-body">
+    {% if form.non_field_errors %}
+      <div class="alert alert-danger">
+        <ul class="mb-0">
+          {% for e in form.non_field_errors %}
+            <li>{{ e }}</li>
           {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+
+    <form method="post" action="" id="signup-form" novalidate>
+      {% csrf_token %}
+
+      {% for field in form.visible_fields %}
+        <div class="mb-3">
+          <label for="id_{{ field.name }}" class="form-label fw-semibold">
+            {{ field.label }}{% if field.field.required %} *{% endif %}
+          </label>
+          {% if field.name == 'password1' or field.name == 'password2' %}
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-lock"></i></span>
+              {{ field }}
+              <button type="button" class="btn btn-outline-primary toggle-pw" data-target="id_{{ field.name }}" aria-label="Toggle password visibility">
+                <i class="bi bi-eye"></i> Show
+              </button>
+            </div>
+          {% else %}
+            <div class="input-group">
+              <span class="input-group-text">
+                {% if 'username' in field.name %}<i class="bi bi-person"></i>
+                {% elif 'email' in field.name %}<i class="bi bi-envelope"></i>
+                {% else %}<i class="bi bi-pencil"></i>{% endif %}
+              </span>
+              {{ field }}
+            </div>
+          {% endif %}
+          {% if field.help_text and field.name != 'password1' %}
+            <div class="form-text">{{ field.help_text }}</div>
+          {% endif %}
+          {% if field.errors %}
+            <div class="invalid-feedback d-block">
+              {% for err in field.errors %}
+                {% if field.name == 'password1' %}
+                  {% if 'too similar' not in err and 'contain at least' not in err and 'commonly used' not in err and 'entirely numeric' not in err %}
+                    {{ err }}{% if not forloop.last %}<br>{% endif %}
+                  {% endif %}
+                {% else %}
+                  {{ err }}{% if not forloop.last %}<br>{% endif %}
+                {% endif %}
+              {% endfor %}
+            </div>
+          {% endif %}
         </div>
-      {% endif %}
-    </div>
-  {% endfor %}
+      {% endfor %}
 
-  <div class="mb-3">
-    <label class="form-label">Password requirements</label>
-    <ul id="pw-rules" class="list-unstyled mb-2">
-      <li data-rule="length" class="text-muted">• At least 8 characters</li>
-      <li data-rule="uppercase" class="text-muted">• At least one uppercase letter</li>
-      <li data-rule="lowercase" class="text-muted">• At least one lowercase letter</li>
-      <li data-rule="digit" class="text-muted">• At least one number</li>
-      <li data-rule="special" class="text-muted">• At least one special character (e.g. @!#)</li>
-      <li data-rule="match" class="text-muted">• Passwords match</li>
-    </ul>
+      <div class="mb-3">
+        <label class="form-label fw-semibold">Password requirements</label>
+        <ul id="pw-rules" class="list-unstyled mb-2 p-3 bg-transparent rounded">
+          <li data-rule="length" class="text-muted"><i class="bi bi-check-circle me-2"></i>At least 8 characters</li>
+          <li data-rule="uppercase" class="text-muted"><i class="bi bi-check-circle me-2"></i>At least one uppercase letter</li>
+          <li data-rule="lowercase" class="text-muted"><i class="bi bi-check-circle me-2"></i>At least one lowercase letter</li>
+          <li data-rule="digit" class="text-muted"><i class="bi bi-check-circle me-2"></i>At least one number</li>
+          <li data-rule="special" class="text-muted"><i class="bi bi-check-circle me-2"></i>At least one special character (e.g. @!#)</li>
+          <li data-rule="match" class="text-muted"><i class="bi bi-check-circle me-2"></i>Passwords match</li>
+        </ul>
+      </div>
+
+      <button class="btn btn-primary w-100 py-2" type="submit" id="signup-submit">
+        <i class="bi bi-person-plus me-2"></i>Sign up
+      </button>
+    </form>
+
+    <p class="mt-4 text-center">Already have an account? <a href="/accounts/login/" class="text-primary text-decoration-none">Log in</a></p>
   </div>
+</div>
 
-  <button class="btn btn-primary" type="submit" id="signup-submit">Sign up</button>
-</form>
-
+<!-- Password validation & toggle script – fully preserved -->
 <script>
 ;(function(){
   const pw1 = document.querySelector('input[name="password1"]');
@@ -87,22 +109,20 @@
       if (checks[key]) {
         li.classList.remove('text-muted');
         li.classList.add('text-success');
+        li.querySelector('i')?.classList.replace('bi-check-circle', 'bi-check-circle-fill');
       } else {
         li.classList.remove('text-success');
         li.classList.add('text-muted');
+        li.querySelector('i')?.classList.replace('bi-check-circle-fill', 'bi-check-circle');
       }
     });
-    // enable submit only if all rules pass
-    const allOk = Object.values(checks).every(Boolean);
-    submit.disabled = !allOk;
+    submit.disabled = !Object.values(checks).every(Boolean);
   }
 
   pw1.addEventListener('input', checkRules);
   pw2.addEventListener('input', checkRules);
-  // run once on load
   checkRules();
 
-  // Toggle show/hide for password fields
   const toggles = Array.from(document.querySelectorAll('.toggle-pw'));
   toggles.forEach(btn => {
     const targetId = btn.getAttribute('data-target');
@@ -111,19 +131,16 @@
     btn.addEventListener('click', function(){
       if (input.type === 'password'){
         input.type = 'text';
-        btn.textContent = 'Hide';
+        btn.innerHTML = '<i class="bi bi-eye-slash"></i> Hide';
       } else {
         input.type = 'password';
-        btn.textContent = 'Show';
+        btn.innerHTML = '<i class="bi bi-eye"></i> Show';
       }
     });
   });
 
-  // HTML5 client-side feedback: toggle invalid class when server responded with errors
   const form = document.getElementById('signup-form');
   form.addEventListener('submit', function(e){
-    // allow submission; server will perform final validation
-    // but keep submit disabled if client-side checks fail
     if (submit.disabled){
       e.preventDefault();
       pw1.focus();
@@ -131,5 +148,4 @@
   });
 })();
 </script>
-<p class="mt-3">Already have an account? <a href="/accounts/login/">Log in</a></p>
 {% endblock %}

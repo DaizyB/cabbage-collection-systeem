@@ -1,41 +1,67 @@
 {% extends 'base.html' %}
 {% block content %}
-<h2>User Profile</h2>
-<div class="card mb-3">
-  <div class="card-body">
-    <h5 class="card-title">Identity</h5>
-    <p><strong>Name:</strong> {{ request.user.get_full_name|default:request.user.username }}</p>
-    <p><strong>Email:</strong> {{ request.user.email }}</p>
-    <p><strong>Phone:</strong> {{ profile.phone }}</p>
-    <p><strong>Account type:</strong> {{ request.user.role|title }}</p>
-    <p><strong>Status:</strong> Active</p>
-    <a href="{% url 'accounts:profile_edit' %}" class="btn btn-outline-primary btn-sm">Edit Profile</a>
+<h2 class="mb-4"><i class="bi bi-person-circle text-primary me-2"></i>User Profile</h2>
+
+<div class="row">
+  <div class="col-md-6">
+    <div class="card mb-4">
+      <div class="card-header bg-transparent">
+        <i class="bi bi-card-heading me-2"></i>Identity
+      </div>
+      <div class="card-body profile-location">
+        <p><strong>Name:</strong> {{ request.user.get_full_name|default:request.user.username }}</p>
+        <p><strong>Email:</strong> {{ request.user.email }}</p>
+        <p><strong>Phone:</strong> {{ profile.phone }}</p>
+        <p><strong>Account type:</strong> <span class="badge bg-primary">{{ request.user.role|title }}</span></p>
+        <p><strong>Status:</strong> <span class="badge bg-success">Active</span></p>
+        <a href="{% url 'accounts:profile_edit' %}" class="btn btn-outline-primary">
+          <i class="bi bi-pencil me-1"></i>Edit Profile
+        </a>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card mb-4">
+      <div class="card-header bg-transparent">
+        <i class="bi bi-geo-alt me-2"></i>Pickup Location
+      </div>
+      <div class="card-body">
+        <p><strong>Address:</strong> {{ profile.address_text }}</p>
+        <p><strong>Region:</strong> {{ profile.region }}</p>
+        <p><strong>Landmark:</strong> {{ profile.landmark }}</p>
+        <p><strong>Latitude:</strong> {{ profile.latitude }} <strong>Longitude:</strong> {{ profile.longitude }}</p>
+        <a href="{% url 'accounts:profile_edit' %}" class="btn btn-outline-secondary">
+          <i class="bi bi-pencil me-1"></i>Edit Location
+        </a>
+      </div>
+    </div>
   </div>
 </div>
-<div class="card mb-3">
-  <div class="card-body">
-    <h5 class="card-title">Pickup Location</h5>
-    <p><strong>Address:</strong> {{ profile.address_text }}</p>
-    <p><strong>Region:</strong> {{ profile.region }}</p>
-    <p><strong>Landmark:</strong> {{ profile.landmark }}</p>
-    <p><strong>Latitude:</strong> {{ profile.latitude }} <strong>Longitude:</strong> {{ profile.longitude }}</p>
-    <a href="{% url 'accounts:profile_edit' %}" class="btn btn-outline-secondary btn-sm">Edit Location</a>
+
+<div class="row">
+  <div class="col-md-6">
+    <div class="card mb-4">
+      <div class="card-header bg-transparent">
+        <i class="bi bi-star me-2"></i>Pickup Preferences
+      </div>
+      <div class="card-body">
+        <p><strong>Preferred days:</strong> {{ profile.preferred_days }}</p>
+        <p><strong>Preferred time:</strong> {{ profile.preferred_time }}</p>
+        <p><strong>Trash types:</strong> {{ profile.trash_types }}</p>
+        <p><strong>Special instructions:</strong> {{ profile.special_instructions }}</p>
+      </div>
+    </div>
   </div>
-</div>
-<div class="card mb-3">
-  <div class="card-body">
-    <h5 class="card-title">Pickup Preferences</h5>
-    <p><strong>Preferred days:</strong> {{ profile.preferred_days }}</p>
-    <p><strong>Preferred time:</strong> {{ profile.preferred_time }}</p>
-    <p><strong>Trash types:</strong> {{ profile.trash_types }}</p>
-    <p><strong>Special instructions:</strong> {{ profile.special_instructions }}</p>
-  </div>
-</div>
-<div class="card mb-3">
-  <div class="card-body">
-    <h5 class="card-title">Contact & Notification</h5>
-    <p><strong>Backup contact:</strong> {{ profile.backup_contact }}</p>
-    <p><strong>Notification method:</strong> {{ profile.notification_method|title }}</p>
+  <div class="col-md-6">
+    <div class="card mb-4">
+      <div class="card-header bg-transparent">
+        <i class="bi bi-bell me-2"></i>Contact & Notification
+      </div>
+      <div class="card-body">
+        <p><strong>Backup contact:</strong> {{ profile.backup_contact }}</p>
+        <p><strong>Notification method:</strong> <span class="badge bg-info">{{ profile.notification_method|title }}</span></p>
+      </div>
+    </div>
   </div>
 </div>
 {% endblock %}

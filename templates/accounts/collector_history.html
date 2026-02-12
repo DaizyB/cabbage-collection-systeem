@@ -1,27 +1,31 @@
 {% extends 'base.html' %}
 {% block content %}
-<h2>Completed Pickups (Last 30 Days)</h2>
-<div class="card mb-3">
+<h2 class="mb-4"><i class="bi bi-clock-history text-primary me-2"></i>Completed Pickups (Last 30 Days)</h2>
+<div class="card">
   <div class="card-body">
     {% if completed %}
       <ul class="list-group">
         {% for p in completed %}
-          <li class="list-group-item d-flex justify-content-between align-items-start">
-            <div>
-              <strong>{{ p.get_state_display }}:</strong> {{ p.address }}
-              <div class="small text-muted">{{ p.scheduled_time }} — Customer: {{ p.customer.get_full_name|default:p.customer.username }}</div>
-              <div class="small">Type: {{ p.trash_type|capfirst }} | Preferred date: {{ p.scheduled_time|date:'Y-m-d' }}</div>
-            </div>
-            <div class="small text-muted">
-              {% if p.verified_at %}Verified: {{ p.verified_at }}{% endif %}
+          <li class="list-group-item">
+            <div class="d-flex justify-content-between">
+              <div>
+                <strong><span class="badge bg-success me-2">{{ p.get_state_display }}</span></strong> {{ p.address }}
+                <div class="small text-muted">{{ p.scheduled_time }} — Customer: {{ p.customer.get_full_name|default:p.customer.username }}</div>
+                <div class="small">Type: {{ p.trash_type|capfirst }} | Preferred date: {{ p.scheduled_time|date:'Y-m-d' }}</div>
+              </div>
+              <div class="small text-muted text-end">
+                {% if p.verified_at %}<i class="bi bi-check-circle text-success"></i> Verified: {{ p.verified_at }}{% endif %}
+              </div>
             </div>
           </li>
         {% endfor %}
       </ul>
     {% else %}
-      <p>No completed pickups in the last 30 days.</p>
+      <p class="text-muted mb-0"><i class="bi bi-inbox me-1"></i>No completed pickups in the last 30 days.</p>
     {% endif %}
   </div>
 </div>
-<a class="btn btn-outline-secondary" href="{% url 'accounts:collector_dashboard' %}">Back to dashboard</a>
+<a class="btn btn-outline-primary mt-3" href="{% url 'accounts:collector_dashboard' %}">
+  <i class="bi bi-arrow-left me-1"></i>Back to dashboard
+</a>
 {% endblock %}

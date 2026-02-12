@@ -1,72 +1,78 @@
 {% extends 'base.html' %}
 {% block content %}
-<h2>Admin Dashboard</h2>
+<h2 class="mb-4"><i class="bi bi-shield-lock text-primary me-2"></i>Admin Dashboard</h2>
 
 <div class="card mb-4">
-  <div class="card-header">Customer Pickup Requests</div>
+  <div class="card-header bg-white">
+    <i class="bi bi-truck me-2"></i>Customer Pickup Requests
+  </div>
   <div class="card-body">
-    <table class="table table-bordered">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Customer</th>
-          <th>Address</th>
-          <th>Trash Type</th>
-          <th>Preferred Date</th>
-          <th>Status</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for p in pickup_requests %}
-        <tr>
-          <td>{{ p.id }}</td>
-          <td>{{ p.customer.get_full_name|default:p.customer.username }}</td>
-          <td>{{ p.address }}</td>
-          <td>{{ p.trash_type|capfirst }}</td>
-          <td>{{ p.scheduled_time|date:'Y-m-d' }}</td>
-          <td>{{ p.get_state_display }}</td>
-        </tr>
-        {% empty %}
-        <tr>
-          <td colspan="6">No pickup requests.</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+    <div class="table-responsive">
+      <table class="table table-hover align-middle">
+        <thead class="table-light">
+          <tr>
+            <th>ID</th>
+            <th>Customer</th>
+            <th>Address</th>
+            <th>Trash Type</th>
+            <th>Preferred Date</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for p in pickup_requests %}
+          <tr>
+            <td>{{ p.id }}</td>
+            <td>{{ p.customer.get_full_name|default:p.customer.username }}</td>
+            <td>{{ p.address }}</td>
+            <td>{{ p.trash_type|capfirst }}</td>
+            <td>{{ p.scheduled_time|date:'Y-m-d' }}</td>
+            <td><span class="badge bg-primary">{{ p.get_state_display }}</span></td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="6" class="text-center text-muted">No pickup requests.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
   </div>
 </div>
 
-<h3>All Pickups</h3>
-<table class="table table-bordered">
-  <thead>
-    <tr>
-      <th>ID</th>
-      <th>Customer</th>
-      <th>Collector</th>
-      <th>Address</th>
-      <th>Trash Type</th>
-      <th>Preferred Date</th>
-      <th>Status</th>
-      <th>Completed</th>
-      <th>Verified At</th>
-      <th>Release Reason</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for p in pickups %}
-    <tr>
-      <td>{{ p.id }}</td>
-      <td>{{ p.customer }}</td>
-      <td>{% if p.collector %}{{ p.collector.get_full_name|default:p.collector.username }}{% else %}—{% endif %}</td>
-      <td>{{ p.address }}</td>
-      <td>{{ p.trash_type|capfirst }}</td>
-      <td>{{ p.scheduled_time|date:'Y-m-d' }}</td>
-      <td>{{ p.get_state_display }}</td>
-      <td>{% if p.state == 'completed' %}✔{% else %}—{% endif %}</td>
-      <td>{% if p.verified_at %}{{ p.verified_at }}{% else %}—{% endif %}</td>
-      <td>{{ p.release_reason }}</td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
+<h3 class="mt-5">All Pickups</h3>
+<div class="table-responsive">
+  <table class="table table-hover align-middle">
+    <thead class="table-light">
+      <tr>
+        <th>ID</th>
+        <th>Customer</th>
+        <th>Collector</th>
+        <th>Address</th>
+        <th>Trash Type</th>
+        <th>Preferred Date</th>
+        <th>Status</th>
+        <th>Completed</th>
+        <th>Verified At</th>
+        <th>Release Reason</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for p in pickups %}
+      <tr>
+        <td>{{ p.id }}</td>
+        <td>{{ p.customer }}</td>
+        <td>{% if p.collector %}{{ p.collector.get_full_name|default:p.collector.username }}{% else %}—{% endif %}</td>
+        <td>{{ p.address }}</td>
+        <td>{{ p.trash_type|capfirst }}</td>
+        <td>{{ p.scheduled_time|date:'Y-m-d' }}</td>
+        <td><span class="badge bg-secondary">{{ p.get_state_display }}</span></td>
+        <td>{% if p.state == 'completed' %}<i class="bi bi-check-circle-fill text-success"></i>{% else %}—{% endif %}</td>
+        <td>{% if p.verified_at %}{{ p.verified_at }}{% else %}—{% endif %}</td>
+        <td>{{ p.release_reason|default:'—' }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
 {% endblock %}

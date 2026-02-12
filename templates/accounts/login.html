@@ -1,20 +1,41 @@
 {% extends 'base.html' %}
 {% block content %}
-<h2>Login</h2>
-{% if errors %}
-  <div class="alert alert-danger">
-    <ul class="mb-0">
-      {% for e in errors %}
-        <li>{{ e }}</li>
-      {% endfor %}
-    </ul>
+<div class="card mx-auto" style="max-width: 480px;">
+  <div class="card-header bg-transparent text-center">
+    <i class="bi bi-box-arrow-in-right fs-1 text-primary"></i>
+    <h3 class="mt-2">Login</h3>
   </div>
-{% endif %}
+  <div class="card-body">
+    {% if errors %}
+      <div class="alert alert-danger">
+        <ul class="mb-0">
+          {% for e in errors %}
+            <li>{{ e }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
 
-<form method="post">
-  {% csrf_token %}
-  <div class="mb-3"><label>Username</label><input class="form-control" name="username" value="{{ username|default:'' }}"></div>
-  <div class="mb-3"><label>Password</label><input type="password" class="form-control" name="password"></div>
-  <button class="btn btn-primary" type="submit">Log in</button>
-</form>
+    <form method="post">
+      {% csrf_token %}
+      <div class="mb-3">
+        <label class="form-label fw-semibold">Username</label>
+        <div class="input-group">
+          <span class="input-group-text"><i class="bi bi-person"></i></span>
+          <input class="form-control" name="username" value="{{ username|default:'' }}">
+        </div>
+      </div>
+      <div class="mb-3">
+        <label class="form-label fw-semibold">Password</label>
+        <div class="input-group">
+          <span class="input-group-text"><i class="bi bi-lock"></i></span>
+          <input type="password" class="form-control" name="password">
+        </div>
+      </div>
+      <button class="btn btn-primary w-100 mt-3" type="submit">
+        <i class="bi bi-box-arrow-in-right me-1"></i>Log in
+      </button>
+    </form>
+  </div>
+</div>
 {% endblock %}

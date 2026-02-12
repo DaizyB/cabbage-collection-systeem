@@ -1,11 +1,28 @@
 {% extends 'base.html' %}
 {% block content %}
-<h2>Contact Us</h2>
-<p>You can reach us at:</p>
-<ul>
-  <li>Email: <a href="mailto:info@trashcollection.com">info@trashcollection.com</a></li>
-  <li>Phone: +1-800-555-TRASH</li>
-  <li>Address: 123 Clean City Road, Green Town, Country</li>
-</ul>
-<p>We are available Monday to Friday, 9am–5pm.</p>
+<div class="card">
+  <div class="card-header bg-white">
+    <i class="bi bi-envelope me-2"></i>Contact Us
+  </div>
+  <div class="card-body">
+    <p class="card-text fs-5">You can reach us at:</p>
+    <ul class="list-unstyled">
+      <li class="mb-3">
+        <i class="bi bi-envelope-fill text-primary me-2"></i>
+        <strong>Email:</strong> <a href="mailto:info@trashcollection.com" class="text-decoration-none">info@trashcollection.com</a>
+      </li>
+      <li class="mb-3">
+        <i class="bi bi-telephone-fill text-primary me-2"></i>
+        <strong>Phone:</strong> +1-800-555-TRASH
+      </li>
+      <li class="mb-3">
+        <i class="bi bi-geo-alt-fill text-primary me-2"></i>
+        <strong>Address:</strong> 123 Clean City Road, Green Town, Country
+      </li>
+    </ul>
+    <p class="mt-4 text-muted">
+      <i class="bi bi-clock me-1"></i>We are available Monday to Friday, 9am–5pm.
+    </p>
+  </div>
+</div>
 {% endblock %}

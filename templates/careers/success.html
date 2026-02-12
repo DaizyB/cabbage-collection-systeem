@@ -1,8 +1,11 @@
 {% extends 'base.html' %}
 {% block content %}
-  <div class="p-4 bg-light rounded">
-    <h2>Application Received</h2>
-    <p>Thank you for applying to become a collector. We will review your application and contact you if you're selected for the next step.</p>
-    <a class="btn btn-primary" href="/">Return home</a>
-  </div>
+<div class="p-5 bg-light rounded text-center">
+  <i class="bi bi-check-circle-fill text-primary display-1 mb-3"></i>
+  <h2 class="fw-bold">Application Received</h2>
+  <p class="lead">Thank you for applying to become a collector. We will review your application and contact you if you're selected for the next step.</p>
+  <a class="btn btn-primary btn-lg mt-3" href="/">
+    <i class="bi bi-house-door me-2"></i>Return home
+  </a>
+</div>
 {% endblock %}

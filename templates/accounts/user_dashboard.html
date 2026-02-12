@@ -2,112 +2,153 @@
 {% block content %}
 {% if messages %}
   {% for message in messages %}
-    <div class="alert alert-{{ message.tags }} mt-2">{{ message }}</div>
+    <div class="alert alert-{{ message.tags }} mt-2 d-flex align-items-center">
+      <i class="bi bi-info-circle-fill me-2"></i>{{ message }}
+    </div>
   {% endfor %}
 {% endif %}
-<h2>User Dashboard</h2>
-<p>Welcome, {{ request.user.get_full_name|default:request.user.username }}.</p>
+
+<h2 class="mb-4"><i class="bi bi-house-door text-primary me-2"></i>User Dashboard</h2>
+<p class="lead">Welcome, {{ request.user.get_full_name|default:request.user.username }}.</p>
+
 <div class="row">
   {% if default_address %}
-    <div class="alert alert-info mb-3">
-      <strong>Your default pickup address:</strong><br>
-      {{ default_address.address_text }}<br>
-      {% if default_address.region %}Region: {{ default_address.region }}<br>{% endif %}
-      {% if default_address.landmark %}Landmark: {{ default_address.landmark }}<br>{% endif %}
+    <div class="col-12">
+      <div class="alert alert-info d-flex align-items-center">
+        <i class="bi bi-info-circle-fill fs-4 me-2"></i>
+        <div>
+          <strong>Your default pickup address:</strong><br>
+          {{ default_address.address_text }}<br>
+          {% if default_address.region %}Region: {{ default_address.region }}<br>{% endif %}
+          {% if default_address.landmark %}Landmark: {{ default_address.landmark }}{% endif %}
+        </div>
+      </div>
     </div>
   {% else %}
-    <div class="alert alert-warning mb-3">
-      <strong>No pickup address set.</strong> Please <a href="/accounts/profile/">add an address in your profile</a> before requesting a pickup.
+    <div class="col-12">
+      <div class="alert alert-warning d-flex align-items-center">
+        <i class="bi bi-exclamation-triangle-fill fs-4 me-2"></i>
+        <div>
+          <strong>No pickup address set.</strong> Please <a href="/accounts/profile/" class="alert-link">add an address in your profile</a> before requesting a pickup.
+        </div>
+      </div>
     </div>
   {% endif %}
+
   <div class="col-md-8">
-    <div class="card mb-3">
-      <div class="card-header">Upcoming Trash Collections</div>
+    <!-- Upcoming Collections -->
+    <div class="card mb-4">
+      <div class="card-header bg-transparent">
+        <i class="bi bi-calendar-check me-2"></i>Upcoming Trash Collections
+      </div>
       <div class="card-body">
-          {% if upcoming %}
-            <ul class="list-group">
-              {% for p in upcoming %}
-                <li class="list-group-item d-flex justify-content-between align-items-start">
-                  <div>
-                    <strong>{{ p.get_state_display }}:</strong> {{ p.address }}
-                    <div class="small text-muted">{{ p.scheduled_time }}</div>
-                  </div>
-                  <div>
-                    {% if p.collector %}
-                      <span class="badge bg-primary">Collector: {{ p.collector.get_full_name|default:p.collector.username }}</span>
-                    {% else %}
-                      <span class="badge bg-secondary">Unassigned</span>
-                    {% endif %}
-                  </div>
-                </li>
-              {% endfor %}
-            </ul>
-          {% else %}
-            <p>No upcoming pickups.</p>
-          {% endif %}
+        {% if upcoming %}
+          <ul class="list-group">
+            {% for p in upcoming %}
+              <li class="list-group-item d-flex justify-content-between align-items-start">
+                <div>
+                  <strong><span class="badge bg-primary me-2">{{ p.get_state_display }}</span></strong> {{ p.address }}
+                  <div class="small text-muted">{{ p.scheduled_time }}</div>
+                </div>
+                <div>
+                  {% if p.collector %}
+                    <span class="badge bg-info"><i class="bi bi-person-badge me-1"></i>{{ p.collector.get_full_name|default:p.collector.username }}</span>
+                  {% else %}
+                    <span class="badge bg-secondary">Unassigned</span>
+                  {% endif %}
+                </div>
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p class="text-muted mb-0"><i class="bi bi-inbox me-1"></i>No upcoming pickups.</p>
+        {% endif %}
       </div>
     </div>
 
-    <div class="card mb-3">
-      <div class="card-header">Request a Pickup</div>
+    <!-- Request Pickup -->
+    <div class="card mb-4">
+      <div class="card-header bg-transparent">
+        <i class="bi bi-plus-circle me-2"></i>Request a Pickup
+      </div>
       <div class="card-body">
         {% if default_address %}
         <form method="post" action="/pickups/request/">
           {% csrf_token %}
           <div class="mb-2">
-            <label class="form-label">Trash type</label>
-            <select name="trash_type" class="form-select">
-              <option value="household">Household</option>
-              <option value="recyclable">Recyclable</option>
-              <option value="bulk">Bulk</option>
-            </select>
+            <label class="form-label fw-semibold">Trash type</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-trash"></i></span>
+              <select name="trash_type" class="form-select">
+                <option value="household">Household</option>
+                <option value="recyclable">Recyclable</option>
+                <option value="bulk">Bulk</option>
+              </select>
+            </div>
           </div>
           <div class="mb-2">
-            <label class="form-label">Preferred date</label>
-            <input type="date" name="preferred_date" class="form-control" />
+            <label class="form-label fw-semibold">Preferred date</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-calendar"></i></span>
+              <input type="date" name="preferred_date" class="form-control" />
+            </div>
           </div>
           <div class="mb-2">
-            <label class="form-label">Notes</label>
-            <textarea name="notes" class="form-control" rows="2"></textarea>
+            <label class="form-label fw-semibold">Notes</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-chat"></i></span>
+              <textarea name="notes" class="form-control" rows="2"></textarea>
+            </div>
           </div>
-          <button class="btn btn-success" type="submit">Request pickup</button>
+          <button class="btn btn-success mt-2" type="submit">
+            <i class="bi bi-send me-1"></i>Request pickup
+          </button>
         </form>
         {% else %}
-        <div class="alert alert-warning">
+        <div class="alert alert-warning mb-0">
           You must <a href="/accounts/profile/">add an address in your profile</a> before requesting a pickup.
         </div>
         {% endif %}
       </div>
     </div>
   </div>
+
   <div class="col-md-4">
-    <div class="card mb-3">
-      <div class="card-header">Pickup Verification QR</div>
-      <div class="card-body">
+    <!-- QR Code Card -->
+    <div class="card mb-4">
+      <div class="card-header bg-transparent">
+        <i class="bi bi-qr-code me-2"></i>Pickup Verification QR
+      </div>
+      <div class="card-body text-center">
         <p class="small">Show this QR code to your collector when pickup is completed.</p>
-        <div id="pickupQr" style="width: 160px; height: 160px;"></div>
+        <div id="pickupQr" style="width: 160px; height: 160px; margin: 0 auto;"></div>
         <div class="small text-muted mt-2">Code: {{ pickup_qr_token }}</div>
       </div>
     </div>
-    <div class="card mb-3">
-      <div class="card-header">Notifications</div>
+
+    <!-- Notifications Card -->
+    <div class="card mb-4">
+      <div class="card-header bg-transparent">
+        <i class="bi bi-bell me-2"></i>Notifications
+      </div>
       <div class="card-body">
         {% if notifications %}
-          <ul class="list-unstyled">
+          <ul class="list-unstyled mb-0">
             {% for n in notifications %}
-              <li class="mb-2">
-                <div>{{ n.message }}</div>
+              <li class="mb-2 pb-2 border-bottom">
+                <div><i class="bi bi-info-circle text-primary me-1"></i>{{ n.message }}</div>
                 <div class="small text-muted">{{ n.created_at }}</div>
               </li>
             {% endfor %}
           </ul>
         {% else %}
-          <p>No notifications.</p>
+          <p class="text-muted mb-0"><i class="bi bi-bell-slash me-1"></i>No notifications.</p>
         {% endif %}
       </div>
     </div>
   </div>
 </div>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script>
   (function() {

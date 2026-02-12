@@ -1,21 +1,145 @@
 {% extends 'base.html' %}
 {% block content %}
-  <div class="jumbotron py-5 text-center">
-    <h1 class="display-4">Clean streets. Smarter collection.</h1>
-    <p class="lead">A simple platform that connects residents, collectors and operators to make waste collection reliable, efficient and accountable.</p>
-    <hr class="my-4">
-    <div class="row justify-content-center">
-      <div class="col-md-8">
-        <ul class="list-unstyled mb-4">
-          <li>• Real-time pickup scheduling and proof-of-service for transparency.</li>
-          <li>• Region-aware collector assignments to reduce missed collections.</li>
-          <li>• Lightweight admin tools and scheduled tasks — built for low-cost hosting.</li>
-        </ul>
-      </div>
-    </div>
-    <p>
-      <a class="btn btn-primary btn-lg me-2" href="/accounts/signup/" role="button">Sign up</a>
-      <a class="btn btn-outline-secondary btn-lg" href="/careers/apply/" role="button">Apply as Collector</a>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap');
+
+  body {
+    font-family: 'Montserrat', sans-serif;
+    background: #0b0a1a;
+    color: #e9eef7;
+  }
+
+  nav.navbar {
+    background: rgba(9, 10, 26, 0.35) !important;
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  nav.navbar .nav-link,
+  nav.navbar .navbar-brand,
+  nav.navbar .navbar-brand strong,
+  nav.navbar .dropdown-toggle,
+  nav.navbar .btn,
+  nav.navbar .bi {
+    color: #eef4ff !important;
+  }
+
+  nav.navbar .btn.btn-primary {
+    background: transparent;
+    border: 1px solid #eef4ff;
+  }
+
+  nav.navbar .btn.btn-primary:hover {
+    background: #eef4ff;
+    color: #0b0a1a !important;
+  }
+
+  main.container {
+    max-width: 100%;
+    padding: 0;
+  }
+
+  .landing-hero {
+    min-height: 100vh;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 120px 8vw 80px;
+    background:
+      radial-gradient(600px 300px at 15% 60%, rgba(32, 160, 255, 0.45), rgba(0, 0, 0, 0) 70%),
+      radial-gradient(700px 420px at 40% 75%, rgba(38, 160, 255, 0.55), rgba(0, 0, 0, 0) 70%),
+      radial-gradient(620px 420px at 65% 35%, rgba(60, 140, 255, 0.35), rgba(0, 0, 0, 0) 70%),
+      linear-gradient(135deg, #0b0a1a 0%, #0d0d26 60%, #0a0b1c 100%);
+    background-attachment: fixed;
+    overflow: hidden;
+  }
+
+  .landing-hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(800px 400px at 70% 60%, rgba(20, 120, 220, 0.35), rgba(0,0,0,0) 70%);
+    opacity: 0.8;
+    pointer-events: none;
+  }
+
+  .hero-card {
+    position: relative;
+    max-width: 620px;
+    text-align: right;
+    z-index: 1;
+  }
+
+  .hero-title {
+    letter-spacing: 0.18em;
+    font-weight: 700;
+    font-size: clamp(2.2rem, 4vw, 3.6rem);
+  }
+
+  .hero-subtitle {
+    color: #cfd7f2;
+    font-size: clamp(1rem, 1.8vw, 1.2rem);
+    line-height: 1.7;
+  }
+
+  .hero-list {
+    list-style: none;
+    padding: 0;
+    margin: 24px 0 0;
+  }
+
+  .hero-list li {
+    margin-bottom: 10px;
+  }
+
+  .hero-actions .btn {
+    border-radius: 999px;
+    padding: 0.75rem 1.8rem;
+  }
+
+  .hero-actions .btn-outline-light {
+    border-color: #e6ecff;
+    color: #e6ecff;
+  }
+
+  .hero-actions .btn-outline-light:hover {
+    background: #e6ecff;
+    color: #0b0a1a;
+  }
+
+  @media (max-width: 991px) {
+    .landing-hero {
+      justify-content: center;
+      text-align: center;
+    }
+    .hero-card {
+      text-align: center;
+    }
+  }
+</style>
+
+<section class="landing-hero">
+  <div class="hero-card">
+    <h1 class="hero-title">
+      <i class="bi bi-trash3 text-info me-2"></i>Clean streets. Smarter collection.
+    </h1>
+    <p class="hero-subtitle my-4">
+      A simple platform that connects residents, collectors and operators to make waste collection reliable, efficient and accountable.
     </p>
+    <ul class="hero-list hero-subtitle">
+      <li><i class="bi bi-check-circle-fill text-info me-2"></i>Real-time pickup scheduling and proof-of-service for transparency.</li>
+      <li><i class="bi bi-check-circle-fill text-info me-2"></i>Region-aware collector assignments to reduce missed collections.</li>
+      <li><i class="bi bi-check-circle-fill text-info me-2"></i>Lightweight admin tools and scheduled tasks — built for low-cost hosting.</li>
+    </ul>
+    <div class="hero-actions mt-4">
+      <a class="btn btn-light me-2" href="/accounts/signup/" role="button">
+        <i class="bi bi-person-plus me-2"></i>Sign up
+      </a>
+      <a class="btn btn-outline-light" href="/careers/apply/" role="button">
+        <i class="bi bi-briefcase me-2"></i>Apply as Collector
+      </a>
+    </div>
   </div>
+</section>
 {% endblock %}

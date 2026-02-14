@@ -19,6 +19,25 @@
         backdrop-filter: blur(10px);
         border-bottom: 1px solid rgba(255, 255, 255, 0.08);
       }
+      .navbar-toggler {
+        border: 1px solid rgba(115, 194, 251, 0.6);
+        color: #73c2fb;
+      }
+      .navbar-toggler:focus {
+        box-shadow: 0 0 0 0.2rem rgba(115, 194, 251, 0.25);
+      }
+      .navbar-collapse {
+        background: rgba(9, 10, 26, 0.7);
+        border-radius: 0.75rem;
+        padding: 0.5rem 0.75rem;
+      }
+      @media (min-width: 992px) {
+        .navbar-collapse {
+          background: transparent;
+          border-radius: 0;
+          padding: 0;
+        }
+      }
       body.has-fixed-nav {
         padding-top: 72px;
       }
@@ -30,7 +49,7 @@
           <strong>Trash Management</strong>
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
+          <i class="bi bi-list fs-3"></i>
         </button>
 
         <div class="collapse navbar-collapse" id="navbarsExample07">
@@ -65,6 +84,11 @@
                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu">
                   <li><a class="dropdown-item" href="/accounts/logout/"><i class="bi bi-box-arrow-right me-2"></i>Sign out</a></li>
                 </ul>
+              </li>
+              <li class="nav-item d-lg-none">
+                <a class="nav-link" href="/accounts/logout/">
+                  <i class="bi bi-box-arrow-right me-1"></i>Sign out
+                </a>
               </li>
             {% else %}
               <li class="nav-item">
